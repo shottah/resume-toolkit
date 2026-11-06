@@ -409,6 +409,11 @@ test_fit_rules_have_no_per_item_deduction() {
   assert_contains "$ROOT/scripts/prompts/fit-rules.md" "blocking"
 }
 
+test_fit_rules_cap_missing_main_stack() {
+  assert_contains "$ROOT/scripts/prompts/fit-rules.md" "main programming language or framework"
+  assert_contains "$ROOT/scripts/prompts/fit-rules.md" "at most 4"
+}
+
 test_scaffold_asks_for_new_fit_fields() {
   local tmp; tmp="$(fresh_copy)"; cd "$tmp"; capture_prompts
   assert_contains ls/prompt "fit_minor_gaps:"

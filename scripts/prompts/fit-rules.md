@@ -35,6 +35,10 @@
    - 1-3: most blocking requirements missing, or a hard bar (years,
      licence, work authorisation) clearly not met.
    Non-blocking gaps can move the score by one point at most.
+   If the job is built around a main programming language or framework
+   (the one most of the work is done in) and source/ shows neither it nor
+   a close sibling of it, the score is at most 4, however much else is
+   covered.
 
    - fit_gaps: the blocking requirements that are missing, each named
      briefly and specifically (for example "5+ years of Go", not "backend
