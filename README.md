@@ -1,10 +1,31 @@
 # Resume Toolkit
 
+**A tailored, one-page resume and cover letter for every job, written by
+Claude Code from your own career history, and never padded with things you
+haven't done.**
+
 Write your career history once, as YAML. Point the tool at a job description
 and Claude writes a tailored, one-page resume and cover letter in LaTeX, which
 [tectonic](https://tectonic-typesetting.github.io/) compiles to PDF. Before
 it writes anything, it scores how well the job fits your experience and lists
 the gaps.
+
+![A tailored resume and cover letter produced from the example profile](docs/images/example-output.png)
+
+## Why it's different
+
+- **It never invents experience.** Every fact comes from your own YAML files.
+  If it isn't in `source/`, it isn't on the page.
+- **It tells you when a job isn't a fit.** Each job gets a 1–10 fit score and
+  a list of the must-haves you can't show, before any time goes into writing.
+- **One page, ATS-friendly, every time.** Single column, standard fonts, clean
+  LaTeX you can edit.
+- **It can't run commands on your machine.** Claude works with a restricted
+  toolset and no shell, so a hostile job posting can't make it do anything.
+- **Your data stays yours.** Your profile and applications are git-ignored;
+  only the tool is shared.
+
+![make application running against the sample job](docs/images/demo.gif)
 
 ## What you need
 

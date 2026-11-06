@@ -132,6 +132,11 @@ test_preferences_are_rules() {
   assert_contains lt/prompt "rules, not facts"
 }
 
+test_no_unbacked_commitments() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"; capture_prompts
+  assert_contains lt/prompt "Never promise anything source/ doesn't state"
+}
+
 test_other_source_files_are_facts() {
   local tmp; tmp="$(fresh_copy)"; cd "$tmp"; capture_prompts
   assert_contains lt/prompt "Any other file there holds facts too"

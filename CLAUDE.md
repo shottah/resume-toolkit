@@ -35,6 +35,7 @@ of truth, then compiles it to PDF with tectonic.
   - `tailor.sh`    — runs `claude -p` to write a tailored resume or cover letter
   - `lib.sh`       — shared helpers (prompt rendering, first-run setup)
   - `prompts/`     — the instructions sent to Claude; edit these to change its behavior
+- `docs/images/` — README images, made from a real run on the example profile.
 - `tests/` — script tests (`make test`); they use a fake `claude`, so they
   need neither Claude nor tectonic.
 
@@ -73,7 +74,9 @@ make test                                              # run the script tests
   application folder.
 - **Never modify `templates/`.** They are structural references only.
 - Read every file in `source/` before tailoring.
-- Facts come only from `source/` — never invent them. `source/preferences.*`
+- Facts come only from `source/` — never invent them, and never promise
+  availability, relocation, work arrangements, salary or visa status that
+  `source/` doesn't state. `source/preferences.*`
   files are rules to follow, not facts to quote.
 - Bullet points lead with a strong past-tense verb and include metrics where
   possible.

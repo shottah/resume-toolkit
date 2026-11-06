@@ -20,6 +20,9 @@ RULES:
   - Result MUST fit on ONE page.
   - ATS-friendly: single column, no graphics, no color, standard fonts.
   - Facts come only from source/. Do not invent facts.
+  - Never promise anything source/ doesn't state: no availability, start
+    dates, relocation, office or travel arrangements, salary or visa claims,
+    even when the job description asks for them.
   - source/preferences.* files are rules, not facts: follow them, but never
     quote them or present them as experience.
   - Select the most relevant highlights and reorder/emphasize skills to match the JD.
