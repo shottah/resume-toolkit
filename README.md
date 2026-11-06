@@ -1,5 +1,7 @@
 # Resume Toolkit
 
+[![test](https://github.com/shottah/resume-toolkit/actions/workflows/test.yml/badge.svg)](https://github.com/shottah/resume-toolkit/actions/workflows/test.yml)
+
 **A tailored, one-page resume and cover letter for every job, written by
 Claude Code from your own career history, and never padded with things you
 haven't done.**
@@ -34,6 +36,14 @@ the gaps.
 - [tectonic](https://tectonic-typesetting.github.io/) (`brew install tectonic`
   or `cargo install tectonic`)
 - `make` and `bash` (already on macOS and most Linux systems)
+
+## Get your own copy
+
+Click **Use this template** at the top of this page and create a new
+repository from it (private is a good choice), then clone it. Your profile
+and applications are git-ignored either way, so they never leave your
+machine. To try it without a GitHub account, a plain `git clone` of this
+repository works too.
 
 ## Try it
 
