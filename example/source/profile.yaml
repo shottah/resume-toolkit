@@ -1,0 +1,16 @@
+# Personal profile and contact information.
+# This is a made-up example person. Replace every value with your own.
+name:
+  first: "Jordan"
+  last: "Ellis"
+phone: "+1 555 0142"
+email: "jordan.ellis@example.com"
+location: "Toronto, ON, Canada"             # city and region you want on the resume
+website: "https://jordanellis.example.com"  # optional
+linkedin: "in/jordan-ellis-example"         # path after linkedin.com/
+github: "jordan-ellis-example"              # username only
+summary: >
+  Analytics engineer who turns messy operational data into trusted models and
+  dashboards for healthcare and logistics teams. Builds dbt and Airflow
+  pipelines on Snowflake, and partners with clinicians, planners and finance
+  leads to make decisions from data they can trust.

@@ -1,0 +1,10 @@
+# Education
+degrees:
+  - institution: "University of Waterloo"
+    degree: "Bachelor of Mathematics, Statistics"
+    location: "Waterloo, ON"
+    start: "2013"
+    end: "2017"
+    gpa: ""                 # optional
+    honors: "Dean's Honours List"
+    coursework: ["Database Systems", "Applied Regression", "Data Visualization"]

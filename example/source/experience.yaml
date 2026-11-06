@@ -1,0 +1,44 @@
+# Professional experience: the core source of truth.
+# Each role carries full detail; tailored resumes pick the most relevant highlights.
+roles:
+  - company: "Brightwater Health Network"
+    blurb: "Regional network of 14 clinics and two hospitals"
+    title: "Senior Analytics Engineer"
+    location: "Toronto, ON"
+    start: "2022-03"
+    end: "present"
+    url: "https://brightwater.example.com"
+    highlights:
+      - "Rebuilt the patient-flow data model in dbt on Snowflake, cutting the nightly refresh from 5 hours to 40 minutes"
+      - "Designed a bed-occupancy forecast in Python that planners use daily, reducing overflow transfers by 18%"
+      - "Introduced dbt tests and data contracts on 60 core models, catching 90% of upstream schema breaks before they reached dashboards"
+      - "Migrated 120 legacy SQL Server reports to Looker, retiring three on-premise servers"
+      - "Mentored three junior analysts through code review and weekly pairing sessions"
+      - "Worked with privacy officers to mask patient identifiers in all analytics environments"
+    tags: [analytics-engineering, dbt, snowflake, python, looker, healthcare, mentoring]
+
+  - company: "Harbourline Logistics"
+    blurb: "Freight forwarder moving 40,000 containers a year across North America"
+    title: "Analytics Engineer"
+    location: "Mississauga, ON"
+    start: "2019-06"
+    end: "2022-02"
+    url: "https://harbourline.example.com"
+    highlights:
+      - "Built Airflow pipelines that pulled carrier, customs and warehouse data into one shipment-tracking model"
+      - "Created an on-time delivery dashboard in Tableau used by 200 operations staff"
+      - "Automated weekly carrier scorecards, saving the operations team 12 hours a week"
+      - "Modelled fuel-surcharge scenarios that informed a contract renegotiation worth $1.2M a year"
+    tags: [airflow, sql, tableau, logistics, data-modeling]
+
+  - company: "Cedar Retail Group"
+    blurb: "Home-goods retailer with 85 stores"
+    title: "Data Analyst"
+    location: "Toronto, ON"
+    start: "2017-05"
+    end: "2019-05"
+    url: "https://cedarretail.example.com"
+    highlights:
+      - "Built store-level sales and inventory reports in SQL and Excel for regional managers"
+      - "Analysed promotion results to show which discounts drove repeat customers, shifting $300K of marketing spend"
+    tags: [sql, excel, retail, reporting]

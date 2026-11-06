@@ -1,0 +1,12 @@
+# Technical skills by category. List only what your experience backs up.
+categories:
+  - name: "Languages"
+    items: ["SQL", "Python"]
+  - name: "Data Stack"
+    items: ["dbt", "Airflow", "Snowflake", "PostgreSQL", "SQL Server"]
+  - name: "Analytics & BI"
+    items: ["Looker", "Tableau", "Excel", "Forecasting"]
+  - name: "Practices"
+    items: ["Data Modeling", "Data Quality Testing", "Code Review", "Git"]
+  - name: "Domains"
+    items: ["Healthcare Operations", "Logistics", "Retail"]

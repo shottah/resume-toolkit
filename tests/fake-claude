@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# Stand-in for the `claude` CLI, used by tests/run.sh.
+# Records its arguments and prompt, then fakes what the real CLI would write.
+#   FAKE_LOG     directory for "args" (one argument per line) and "prompt"
+#   FAKE_DIR     scaffold mode: create this application folder and print its path
+#   FAKE_FIT     fit_score written to notes.md in scaffold mode (default 8)
+#   FAKE_OUTPUT  tailor mode: write a minimal .tex file to this path
+set -euo pipefail
+
+log="${FAKE_LOG:?FAKE_LOG must be set}"
+mkdir -p "$log"
+: > "$log/args"
+prompt=""
+while [ $# -gt 0 ]; do
+  printf '%s\n' "$1" >> "$log/args"
+  if [ "$1" = "-p" ] && [ $# -gt 1 ]; then
+    prompt="$2"
+    printf '%s\n' "$2" >> "$log/args"
+    shift
+  fi
+  shift
+done
+printf '%s' "$prompt" > "$log/prompt"
+
+if [ -n "${FAKE_DIR:-}" ]; then
+  mkdir -p "$FAKE_DIR"
+  printf 'Fake job description.\n' > "$FAKE_DIR/job-description.md"
+  cat > "$FAKE_DIR/notes.md" <<NOTES
+---
+stage: fit_checked
+outcome: open
+applied_date: ""
+company: "Fake Co"
+role: "Fake Role"
+url: ""
+contacts: []
+fit_score: ${FAKE_FIT:-8}
+fit_gaps: [Fake gap]
+---
+
+## Notes
+NOTES
+  printf '%s\n' "$FAKE_DIR"
+fi
+
+if [ -n "${FAKE_OUTPUT:-}" ]; then
+  printf '%s\n' '\documentclass{article}\begin{document}x\end{document}' > "$FAKE_OUTPUT"
+fi

@@ -1,0 +1,20 @@
+# Notable projects outside (or alongside) your jobs.
+projects:
+  - name: "transit-delays"
+    role: "Author"
+    date: "2024"
+    url: "https://github.com/jordan-ellis-example/transit-delays"
+    description: "Open dataset and dashboard tracking city bus delays from public feeds"
+    highlights:
+      - "Loads public GTFS feeds daily with Python and dbt into DuckDB"
+      - "Dashboard viewed by 4,000 people after a local news feature"
+    tags: [python, dbt, open-data]
+
+  - name: "Data Mentors Toronto"
+    role: "Volunteer organizer"
+    date: "2021"
+    url: ""
+    description: "Monthly mentoring meetup for people moving into data careers"
+    highlights:
+      - "Matched 50 career changers with mentors over three years"
+    tags: [mentoring, community]

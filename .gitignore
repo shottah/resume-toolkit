@@ -1,0 +1,21 @@
+# Compiled output — never tracked
+*.pdf
+out/
+*.synctex.gz
+.tectonic/
+
+# OS / editor
+.DS_Store
+*.swp
+*~
+.vscode/
+.idea/
+
+# Local agent state
+.claude/settings.local.json
+.superpowers/
+
+# Your own data — never published
+/source
+/applications
+/source.tmp.*

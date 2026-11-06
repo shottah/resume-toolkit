@@ -1,0 +1,120 @@
+\documentclass[11pt,letterpaper]{article}
+
+% ---- Margins ----
+\usepackage[top=0.5in, bottom=0.5in, left=0.6in, right=0.6in]{geometry}
+
+% ---- Font ----
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+
+% ---- No page numbers ----
+\pagestyle{empty}
+
+% ---- Spacing ----
+\usepackage{enumitem}
+\setlist[itemize]{nosep, left=0pt..1.5em}
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{6pt}{3pt}
+
+% ---- Section formatting ----
+\titleformat{\section}{\large\bfseries\uppercase}{}{0pt}{}[\titlerule]
+
+% ---- Hyperlinks ----
+\usepackage[hidelinks]{hyperref}
+
+% ---- Custom commands ----
+\newcommand{\role}[4]{%
+  % #1=title  #2=company  #3=dates  #4=location
+  \noindent\textbf{#1} \hfill #4 \\
+  \textit{#2} \hfill \textit{#3}\par
+}
+
+\newcommand{\project}[2]{%
+  % #1=name  #2=date or tech stack
+  \noindent\textbf{#1} \hfill \textit{#2}\par
+}
+
+% =====================================================================
+\begin{document}
+
+% ---- HEADER ----
+% source: source/profile.yaml
+\begin{center}
+  {\LARGE\textbf{First Last}} \\[3pt]
+  City, Country \enspace$\cdot$\enspace
+  \href{mailto:email@example.com}{email@example.com} \enspace$\cdot$\enspace
+  +1 555 0100 \\
+  \href{https://linkedin.com/in/example}{linkedin.com/in/example} \enspace$\cdot$\enspace
+  \href{https://github.com/example}{github.com/example} \enspace$\cdot$\enspace
+  \href{https://example.com}{example.com}
+\end{center}
+
+% ---- SUMMARY ----
+% source: source/profile.yaml → summary
+\noindent One or two sentences on who you are, the work you do best, and the results you are known for.
+\vspace{4pt}
+
+% ---- EXPERIENCE ----
+% source: source/experience.yaml
+\section{Experience}
+
+\role{Job Title}{Company}{Mon YYYY -- Present}{City, Country}
+\begin{itemize}
+  \item Led a project that improved a key metric by N\%
+  \item Built a tool or system that saved the team N hours a week
+  \item Shipped a feature used by N customers
+  \item Worked with another team to deliver an outcome
+\end{itemize}
+\vspace{4pt}
+
+\role{Job Title}{Company}{Mon YYYY -- Mon YYYY}{City, Country}
+\begin{itemize}
+  \item Led a project that improved a key metric by N\%
+  \item Built a tool or system that saved the team N hours a week
+  \item Shipped a feature used by N customers
+  \item Worked with another team to deliver an outcome
+  \item Mentored or trained colleagues on a skill
+\end{itemize}
+\vspace{4pt}
+
+\role{Job Title}{Company}{Mon YYYY -- Mon YYYY}{}
+\begin{itemize}
+  \item Led a project that improved a key metric by N\%
+  \item Built a tool or system that saved the team N hours a week
+  \item Shipped a feature used by N customers
+  \item Worked with another team to deliver an outcome
+  \item Mentored or trained colleagues on a skill
+\end{itemize}
+\vspace{4pt}
+
+\role{Job Title}{Company}{Mon YYYY -- Mon YYYY}{City, Country}
+\begin{itemize}
+  \item Led a project that improved a key metric by N\%
+  \item Built a tool or system that saved the team N hours a week
+  \item Shipped a feature used by N customers
+  \item Worked with another team to deliver an outcome
+  \item Mentored or trained colleagues on a skill
+\end{itemize}
+
+% ---- EDUCATION ----
+% source: source/education.yaml
+\section{Education}
+
+\noindent\textbf{Degree, Field of Study} \hfill City, Country \\
+\textit{University Name} \hfill \textit{YYYY -- YYYY}
+\vspace{4pt}
+
+\noindent\textbf{Certificate or Course} \hfill Remote \\
+\textit{Provider} \hfill \textit{YYYY}
+
+% ---- SKILLS ----
+% source: source/skills.yaml
+\section{Skills}
+
+\noindent\textbf{Languages:} Skill, Skill, Skill \\
+\textbf{Frameworks:} Skill, Skill, Skill \\
+\textbf{Tools:} Skill, Skill, Skill \\
+\textbf{Infrastructure:} Skill, Skill \\
+\textbf{Domain:} Area, Area, Area
+
+\end{document}
