@@ -366,10 +366,21 @@ test_fit_rules_are_shared() {
   local tmp; tmp="$(fresh_copy)"; cd "$tmp"; make_app_folder
   capture_prompts
   run_recheck applications/x
-  local rule; rule="$(grep -m1 'subtract' scripts/prompts/fit-rules.md)"
+  local rule; rule="$(grep -m1 'Do not subtract points per missing item' scripts/prompts/fit-rules.md)"
   [ -n "$rule" ] || fail "fit-rules.md has no scoring rule"
   assert_contains ls/prompt "$rule"
   assert_contains log/prompt "$rule"
+}
+
+test_fit_rules_have_no_per_item_deduction() {
+  assert_not_contains "$ROOT/scripts/prompts/fit-rules.md" "subtract ~2"
+  assert_contains "$ROOT/scripts/prompts/fit-rules.md" "blocking"
+}
+
+test_scaffold_asks_for_new_fit_fields() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"; capture_prompts
+  assert_contains ls/prompt "fit_minor_gaps:"
+  assert_contains ls/prompt "fit_confidence:"
 }
 
 test_recheck_updates_only_fit_lines() {

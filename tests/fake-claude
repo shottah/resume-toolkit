@@ -48,6 +48,8 @@ url: ""
 contacts: []
 fit_score: ${FAKE_FIT:-8}
 fit_gaps: [Fake gap]
+fit_minor_gaps: []
+fit_confidence: high
 ---
 
 ## Notes

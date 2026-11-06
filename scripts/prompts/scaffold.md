@@ -39,7 +39,9 @@ STEPS (use tool calls, in order):
      url: "{{URL_FIELD}}"
      contacts: []
      fit_score: <integer 1-10>
-     fit_gaps: [<unmet must-haves, or empty list>]
+     fit_gaps: [<missing blocking requirements, or empty list>]
+     fit_minor_gaps: [<missing non-blocking requirements, or empty list>]
+     fit_confidence: <high | medium | low>
      ---
 
      ## Notes
