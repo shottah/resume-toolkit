@@ -8,6 +8,7 @@
 #                (when unset, the path after "to:" in a tailoring prompt is used)
 #   FAKE_CHATTER tailor mode: text to print on stdout, like the real CLI's final message
 #   FAKE_FAIL    exit with this code after recording the call
+#   FAKE_REPLY   re-check mode: print this instead of a well-formed fit result
 set -euo pipefail
 
 log="${FAKE_LOG:?FAKE_LOG must be set}"
@@ -28,6 +29,7 @@ printf '%s' "$prompt" > "$log/prompt"
 
 case "$prompt" in
   Scaffold*) mode=scaffold ;;
+  Re-score*) mode=recheck ;;
   *"You are tailoring"*) mode=tailor ;;
   *) mode=other ;;
 esac
@@ -57,6 +59,14 @@ if [ "$mode" = tailor ]; then
   output="${FAKE_OUTPUT:-$(printf '%s\n' "$prompt" | sed -n '/^Write a tailored/{n;s/^ *//;p;}')}"
   printf '%s\n' '\documentclass{article}\begin{document}x\end{document}' > "$output"
 fi
+if [ "$mode" = recheck ]; then
+  if [ -n "${FAKE_REPLY:-}" ]; then
+    printf '%s\n' "$FAKE_REPLY"
+  else
+    printf 'fit_score: %s\nfit_gaps: ["Fake gap"]\n' "${FAKE_FIT:-8}"
+  fi
+fi
+
 if [ "$mode" = tailor ] && [ -n "${FAKE_CHATTER:-}" ]; then
   printf '%s\n' "$FAKE_CHATTER"
 fi

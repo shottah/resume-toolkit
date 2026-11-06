@@ -36,9 +36,11 @@ of truth, then compiles it to PDF with tectonic.
 - `scripts/` — the workflow scripts.
   - `scaffold.sh`  — creates the application folder from a job description and scores the fit
   - `tailor.sh`    — runs `claude -p` to write a tailored resume or cover letter
+  - `recheck.sh`   — re-scores an existing application; updates only `fit_score` and `fit_gaps`
   - `command.sh`   — runs `fit` or `apply` for the Claude Code commands and prints only a summary
   - `lib.sh`       — shared helpers (prompt rendering, first-run setup)
   - `prompts/`     — the instructions sent to Claude; edit these to change its behavior
+    (`fit-rules.md` holds the scoring rules shared by the first check and re-checks)
 - `docs/images/` — README images, made from a real run on the example profile.
 - `tests/` — script tests (`make test`); they use a fake `claude`, so they
   need neither Claude nor tectonic.
@@ -49,6 +51,7 @@ of truth, then compiles it to PDF with tectonic.
 make application JD=<path-or-url>                      # full flow
 make resume       DIR=<app-dir> [JD=<path-or-url>]     # re-tailor the resume only
 make cover-letter DIR=<app-dir> [JD=<path-or-url>]     # re-tailor the cover letter only
+make fit          DIR=<app-dir>                        # re-check the fit against the current source/
 make pdf          TEX=<file.tex>                       # compile one .tex file
 make test                                              # run the script tests
 ```
@@ -120,7 +123,8 @@ Free-form notes go below the frontmatter.
 ## Fit gate
 
 `scaffold.sh` scores each job description against `source/` and warns when
-`fit_score` is below 7. Only go ahead with a low-fit application when you can
+`fit_score` is below 7. `make fit DIR=<app-dir>` (or `/fit <app-dir>`) re-scores
+an existing application with the same rules after `source/` changes. Only go ahead with a low-fit application when you can
 name what bridges the gap (a related domain, a referral, a transferable
 project) and say so in the cover letter. Otherwise, strengthen `source/` with
 real experience you left out, or skip the role.

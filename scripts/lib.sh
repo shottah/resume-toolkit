@@ -51,3 +51,16 @@ ensure_source() {
   echo "error: could not create source/ from example/source/ (is the folder writable?)" >&2
   exit 1
 }
+
+# fit_gate_warning <notes.md>
+# Warn on stderr when the fit score is below 7 (see "Fit gate" in CLAUDE.md).
+fit_gate_warning() {
+  local fit
+  fit="$(sed -n 's/^fit_score: *//p' "$1" | head -1)"
+  if [ -n "$fit" ] && ! [[ "$fit" =~ ^[0-9]+$ ]]; then
+    echo "==> WARNING: fit_score is not a plain integer ('$fit') — fit gate cannot evaluate it" >&2
+  elif [ -n "$fit" ] && [ "$fit" -lt 7 ]; then
+    echo "==> WARNING: fit_score=$fit (<7). Gaps: $(sed -n 's/^fit_gaps: *//p' "$1")" >&2
+    echo "==> Low-fit application — see CLAUDE.md 'Fit gate' before investing time." >&2
+  fi
+}

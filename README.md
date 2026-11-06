@@ -70,7 +70,8 @@ Open Claude Code in your copy of the repo and use the two built-in commands:
 ```
 
 - `/fit <job link or file>` scores the job against your profile and lists the
-  gaps, without writing any documents.
+  gaps, without writing any documents. Give it an application folder instead
+  to re-check that job against your current profile.
 - `/apply <job link, file, or folder from /fit>` writes the tailored resume and
   cover letter and tells you where the PDFs are.
 
@@ -108,6 +109,7 @@ machine even if you push changes to the tool.
 make application  JD=<path-or-url>                    # create a folder, check the fit, write both documents
 make resume       DIR=<app-dir> [JD=<path-or-url>]    # rewrite the resume only
 make cover-letter DIR=<app-dir> [JD=<path-or-url>]    # rewrite the cover letter only
+make fit          DIR=<app-dir>                       # re-check the fit after editing source/
 make pdf          TEX=<file.tex>                      # compile one .tex file
 make test                                             # run the script tests
 make help                                             # show this list
@@ -121,7 +123,9 @@ out.
 
 `make application` first scores the job against `source/` from 1 to 10 and
 lists the must-haves your `source/` doesn't cover, in `notes.md` as
-`fit_score` and `fit_gaps`. Below 7 it prints a warning and carries on. If
+`fit_score` and `fit_gaps`. Below 7 it prints a warning and carries on.
+After you add experience to `source/`, `make fit DIR=<app-dir>` re-checks an
+existing application and updates only those two lines. If
 you can't honestly bridge the gap, press Ctrl-C to stop before the documents
 are written. Often the fix is adding real experience to `source/` that you
 had left out.

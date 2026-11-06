@@ -34,6 +34,7 @@ DATE_MONTH=$(date +%Y-%m)
 
 PROMPT=$(render_prompt "$(dirname "$0")/prompts/scaffold.md" \
   "DATE_MONTH=${DATE_MONTH}" \
+  "FIT_RULES=$(cat "$(dirname "$0")/prompts/fit-rules.md")" \
   "JD_FETCH=${JD_FETCH}" \
   "JD_INPUT=${JD_INPUT}" \
   "URL_FIELD=${URL_FIELD}")
@@ -55,13 +56,7 @@ DIR="${DIR%% }"
 [ -f "$DIR/job-description.md" ]    || { echo "error: missing $DIR/job-description.md" >&2; exit 1; }
 [ -f "$DIR/notes.md" ]              || { echo "error: missing $DIR/notes.md" >&2; exit 1; }
 
-FIT=$(sed -n 's/^fit_score: *//p' "$DIR/notes.md" | head -1)
-if [ -n "$FIT" ] && ! [[ "$FIT" =~ ^[0-9]+$ ]]; then
-  echo "==> WARNING: fit_score is not a plain integer ('$FIT') — fit gate cannot evaluate it" >&2
-elif [ -n "$FIT" ] && [ "$FIT" -lt 7 ]; then
-  echo "==> WARNING: fit_score=$FIT (<7). Gaps: $(sed -n 's/^fit_gaps: *//p' "$DIR/notes.md")" >&2
-  echo "==> Low-fit application — see CLAUDE.md 'Fit gate' before investing time." >&2
-fi
+fit_gate_warning "$DIR/notes.md"
 
 echo "==> scaffolded: $DIR" >&2
 echo "$DIR"

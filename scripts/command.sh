@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Run the workflow for the Claude Code commands in .claude/commands/.
 #
-#   scripts/command.sh fit   <job link | job description file>
+#   scripts/command.sh fit   <job link | job description file | applications/ folder>
 #   scripts/command.sh apply <job link | job description file | applications/ folder>
 #
 # Prints only a short summary. Everything else, including whatever the inner
@@ -30,8 +30,10 @@ fail() {
   exit 1
 }
 
+RECHECK=0
 if [ -d "$TARGET" ] && [ -f "$TARGET/notes.md" ]; then
   DIR="${TARGET%/}"
+  [ "$ACTION" = fit ] && RECHECK=1
 else
   DIR="$(scripts/scaffold.sh "$TARGET" 2>>"$LOG")" || fail "the fit check"
 fi
@@ -40,6 +42,10 @@ fi
 cat "$LOG" >> "$DIR/run.log"
 rm -f "$LOG"
 LOG="$DIR/run.log"
+
+if [ "$RECHECK" = 1 ]; then
+  scripts/recheck.sh "$DIR" >>"$LOG" 2>&1 || fail "the fit re-check"
+fi
 
 if [ "$ACTION" = apply ]; then
   make --no-print-directory resume DIR="$DIR" >>"$LOG" 2>&1 || fail "writing the resume"

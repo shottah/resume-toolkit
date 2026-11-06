@@ -333,6 +333,111 @@ test_command_rejects_unknown_action() {
   assert_contains sum "Usage:"
 }
 
+# ---- re-checking fit (scripts/recheck.sh) ------------------------------------------
+
+# An application folder past the first check, with notes and contacts to keep.
+make_app_folder() {
+  mkdir -p applications/x
+  printf 'Fake job description.\n' > applications/x/job-description.md
+  cat > applications/x/notes.md <<'NOTES'
+---
+stage: ready
+outcome: open
+applied_date: ""
+company: "Fake Co"
+role: "Fake Role"
+url: "https://ex.com/job"
+contacts: [Ann]
+fit_score: 3
+fit_gaps: [Old gap]
+---
+
+## Notes
+
+My own notes stay.
+NOTES
+}
+
+run_recheck() {
+  CLAUDE="$FAKE" FAKE_LOG="$PWD/log" bash scripts/recheck.sh "$@" >out 2>err
+}
+
+test_fit_rules_are_shared() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"; make_app_folder
+  capture_prompts
+  run_recheck applications/x
+  local rule; rule="$(grep -m1 'subtract' scripts/prompts/fit-rules.md)"
+  [ -n "$rule" ] || fail "fit-rules.md has no scoring rule"
+  assert_contains ls/prompt "$rule"
+  assert_contains log/prompt "$rule"
+}
+
+test_recheck_updates_only_fit_lines() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"; make_app_folder
+  cp applications/x/notes.md before.md
+  FAKE_FIT=9 run_recheck applications/x
+  assert_contains applications/x/notes.md "fit_score: 9"
+  assert_contains applications/x/notes.md 'fit_gaps: ["Fake gap"]'
+  diff before.md applications/x/notes.md | grep '^[<>]' | grep -v -E '^[<>] fit_(score|gaps):' && fail "other lines changed"
+  assert_contains applications/x/notes.md "stage: ready"
+  assert_contains applications/x/notes.md "My own notes stay."
+}
+
+test_recheck_tools_are_read_only() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"; make_app_folder
+  run_recheck applications/x
+  assert_eq "Read,Glob,Grep" "$(grep -A1 -x -- '--tools' log/args | tail -1)" "recheck --tools"
+  assert_contains log/prompt "applications/x/job-description.md"
+}
+
+test_recheck_rejects_malformed_reply() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"; make_app_folder
+  cp applications/x/notes.md before.md
+  local rc=0
+  FAKE_REPLY="I think it is a great fit!" run_recheck applications/x || rc=$?
+  [ "$rc" -ne 0 ] || fail "expected a non-zero exit"
+  assert_contains err "unexpected reply"
+  cmp -s before.md applications/x/notes.md || fail "notes.md changed"
+}
+
+test_recheck_rejects_out_of_range_score() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"; make_app_folder
+  local rc=0
+  FAKE_REPLY=$'fit_score: 11\nfit_gaps: []' run_recheck applications/x || rc=$?
+  [ "$rc" -ne 0 ] || fail "expected a non-zero exit"
+  assert_contains applications/x/notes.md "fit_score: 3"
+}
+
+test_recheck_requires_application_folder() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"
+  local rc=0; run_recheck applications/nope || rc=$?
+  [ "$rc" -ne 0 ] || fail "expected a non-zero exit"
+  assert_contains err "not an application folder"
+}
+
+test_recheck_warns_below_7() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"; make_app_folder
+  FAKE_FIT=4 run_recheck applications/x
+  assert_contains err "fit_score=4 (<7)"
+  assert_contains out "fit_score: 4"
+}
+
+test_command_fit_on_folder_rechecks() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"; make_app_folder
+  CLAUDE="$FAKE" TECTONIC="$FAKE_TEX" FAKE_LOG="$PWD/log" FAKE_FIT=6 \
+    bash scripts/command.sh fit applications/x >sum 2>&1
+  assert_contains log/prompt "Re-score"
+  assert_contains sum "fit_score: 6"
+  assert_contains applications/x/notes.md "stage: ready"
+}
+
+test_make_fit_rechecks() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"; make_app_folder
+  CLAUDE="$FAKE" TECTONIC="$FAKE_TEX" FAKE_LOG="$PWD/log" FAKE_FIT=7 \
+    make --no-print-directory fit DIR=applications/x >out 2>&1 || fail "make fit failed: $(cat out)"
+  assert_contains applications/x/notes.md "fit_score: 7"
+}
+
 # ---- runner -----------------------------------------------------------------
 
 passed=0

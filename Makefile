@@ -4,7 +4,7 @@ export CLAUDE
 
 .DEFAULT_GOAL := help
 
-.PHONY: resume cover-letter application pdf test check-deps help
+.PHONY: resume cover-letter application fit pdf test check-deps help
 
 # ===== Public workflow =====
 
@@ -32,6 +32,13 @@ application: check-deps
 	 DIR=$$(./scripts/scaffold.sh "$(JD)"); \
 	 $(MAKE) --no-print-directory resume       DIR="$$DIR"; \
 	 $(MAKE) --no-print-directory cover-letter DIR="$$DIR"
+
+# Re-check an existing application's fit against your current source/.
+# Updates only fit_score and fit_gaps in its notes.md.
+#   make fit DIR=applications/YYYY-MM-co-role
+fit:
+	@test -n "$(DIR)" || { echo "Usage: make fit DIR=applications/YYYY-MM-co-role"; exit 1; }
+	@./scripts/recheck.sh "$(DIR)"
 
 # Compile a single .tex file to PDF. Output lands at <dirname>/out/<basename>.pdf
 #   make pdf TEX=path/to/file.tex
@@ -73,6 +80,10 @@ help:
 	@echo "      Claude derives company/role from the JD, scaffolds"
 	@echo "      applications/YYYY-MM-<slug>/, then runs both 'resume' and"
 	@echo "      'cover-letter' for it."
+	@echo ""
+	@echo "  make fit          DIR=applications/YYYY-MM-co-role"
+	@echo "      Re-check an application's fit against your current source/;"
+	@echo "      updates only fit_score and fit_gaps in its notes.md."
 	@echo ""
 	@echo "  make pdf          TEX=path/to/file.tex"
 	@echo "      Compile any .tex file to <its-dir>/out/<basename>.pdf."

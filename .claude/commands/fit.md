@@ -1,6 +1,6 @@
 ---
-description: Check how well a job fits your experience, without writing any documents
-argument-hint: <job link | job description file>
+description: Check how well a job fits your experience (or re-check an applications/ folder), without writing any documents
+argument-hint: <job link | job description file | applications/ folder>
 allowed-tools: Bash(scripts/command.sh fit:*)
 ---
 
@@ -10,8 +10,10 @@ Run this command with the Bash tool, keeping the argument in double quotes:
 scripts/command.sh fit "$ARGUMENTS"
 ```
 
-A restricted Claude with no shell reads the job description, scores it
-against `source/` from 1 to 10, and creates the application folder.
+A restricted Claude with no shell reads the job description and scores it
+against `source/` from 1 to 10. For a job link or file it creates the
+application folder; for an existing `applications/` folder it re-checks the
+fit and updates only the score and gaps.
 
 When it finishes, tell the user in a few short lines: the company and role,
 the fit score, and the gaps. If the score is 7 or higher, suggest
