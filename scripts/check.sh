@@ -23,29 +23,15 @@ warn() { echo "warning: $TEX: $*" >&2; }
 # ---- pages ------------------------------------------------------------------
 # Resumes may run to 2 pages when source/preferences.yaml says "resume_pages: 2";
 # everything else is one page.
-LIMIT=1
-if [ "$(basename "$TEX")" = resume.tex ]; then
-  LIMIT="$(source "$HERE/lib.sh"; resume_pages)"
-fi
-OUT="$(dirname "$TEX")/out"
-LOG="$OUT/$(basename "$TEX" .tex).log"
-PDF="$OUT/$(basename "$TEX" .tex).pdf"
-pages=""
-if [ -f "$LOG" ]; then
-  pages="$(sed -n 's/.*Output written on .* (\([0-9][0-9]*\) pages\{0,1\}.*/\1/p' "$LOG" | head -1)"
-fi
+source "$HERE/lib.sh"
+LIMIT="$(page_limit "$TEX")"
+pages="$(pdf_pages "$TEX")"
 if [ -n "$pages" ] && [ "$pages" -gt "$LIMIT" ]; then
-  if [ "$LIMIT" = 1 ]; then
-    warn "runs to $pages pages (keep it to 1)"
-  else
-    warn "runs to $pages pages (keep it to $LIMIT)"
-  fi
-elif [ "$LIMIT" = 2 ] && [ "$pages" = 2 ] && [ -f "$PDF" ] &&
-     command -v "${PDFTOTEXT:-pdftotext}" >/dev/null 2>&1; then
+  warn "runs to $pages pages (keep it to $LIMIT)"
+elif [ "$LIMIT" = 2 ] && [ "$pages" = 2 ]; then
   # A second page with less than half as much text as the first looks like overflow.
-  p1="$("${PDFTOTEXT:-pdftotext}" -f 1 -l 1 -layout "$PDF" - 2>/dev/null | grep -c '[^[:space:]]' || true)"
-  p2="$("${PDFTOTEXT:-pdftotext}" -f 2 -l 2 -layout "$PDF" - 2>/dev/null | grep -c '[^[:space:]]' || true)"
-  if [ "${p1:-0}" -gt 0 ] && [ $((p2 * 2)) -lt "$p1" ]; then
+  p1="$(page_lines "$TEX" 1)"; p2="$(page_lines "$TEX" 2)"
+  if [ -n "$p1" ] && [ -n "$p2" ] && [ "$p1" -gt 0 ] && [ $((p2 * 2)) -lt "$p1" ]; then
     warn "second page is mostly empty ($p2 lines against $p1 on page 1): fill it or cut to one page"
   fi
 fi

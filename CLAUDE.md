@@ -38,6 +38,9 @@ of truth, then compiles it to PDF with tectonic.
   - `scaffold.sh`  — creates the application folder from a job description and scores the fit
   - `tailor.sh`    — runs `claude -p` to write a tailored resume or cover letter
   - `recheck.sh`   — re-scores an existing application; updates only the four `fit_*` lines
+  - `fit-length.sh` — compiles a tailored `.tex` and, if it runs over its page limit
+    (or a two-page resume's second page is mostly empty), has Claude adjust the
+    length and recompiles, at most twice; Claude gets only Read, Edit, Glob, Grep
   - `check.sh`     — after each PDF build, warns about extra pages (or a nearly
     empty second page, when `pdftotext` is installed), stock phrases
     (`stock-phrases.txt`) and numbers not found in `source/`; never fails the build
@@ -77,8 +80,10 @@ make test                                              # run the script tests
 4. Inside that session, Claude reads `CLAUDE.md`, every file in `source/`, the
    relevant `templates/*.tex` and the job description, then writes the
    tailored `.tex` file in the application folder.
-5. The Makefile then runs `make pdf TEX=...` to compile it with tectonic into
-   `<DIR>/out/`.
+5. The Makefile then runs `scripts/fit-length.sh`, which compiles it with
+   tectonic into `<DIR>/out/` and, if it doesn't fit its page limit, has
+   Claude cut (or fill) it and compiles again. `scripts/check.sh` then warns
+   about anything still wrong.
 
 ## Tailoring rules
 

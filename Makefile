@@ -1,6 +1,6 @@
 TECTONIC ?= tectonic
 CLAUDE   ?= claude
-export CLAUDE
+export CLAUDE TECTONIC
 
 .DEFAULT_GOAL := help
 
@@ -8,19 +8,23 @@ export CLAUDE
 
 # ===== Public workflow =====
 
-# Generate a tailored resume.tex via Claude, then compile to PDF.
+# Generate a tailored resume.tex via Claude, compile it, fit it to its page
+# limit (scripts/fit-length.sh), then run the checks.
 #   make resume DIR=applications/YYYY-MM-co-role [JD=<path-or-url>]
 resume: check-deps
 	@test -n "$(DIR)" || { echo "Usage: make resume DIR=applications/YYYY-MM-co-role [JD=<path-or-url>]"; exit 1; }
 	@./scripts/tailor.sh resume "$(DIR)" "$(JD)"
-	@$(MAKE) --no-print-directory pdf TEX="$(DIR)/resume.tex"
+	@./scripts/fit-length.sh "$(DIR)/resume.tex"
+	@./scripts/check.sh "$(DIR)/resume.tex"
 
-# Generate a tailored cover-letter.tex via Claude, then compile to PDF.
+# Generate a tailored cover-letter.tex via Claude, compile it, fit it to one
+# page, then run the checks.
 #   make cover-letter DIR=applications/YYYY-MM-co-role [JD=<path-or-url>]
 cover-letter: check-deps
 	@test -n "$(DIR)" || { echo "Usage: make cover-letter DIR=applications/YYYY-MM-co-role [JD=<path-or-url>]"; exit 1; }
 	@./scripts/tailor.sh cover-letter "$(DIR)" "$(JD)"
-	@$(MAKE) --no-print-directory pdf TEX="$(DIR)/cover-letter.tex"
+	@./scripts/fit-length.sh "$(DIR)/cover-letter.tex"
+	@./scripts/check.sh "$(DIR)/cover-letter.tex"
 
 # Full application: scaffold a DIR from a JD, then tailor + compile both.
 #   make application JD=<path-or-url>

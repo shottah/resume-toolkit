@@ -3,6 +3,7 @@
 #   [--keep-logs] -o <dir> <file.tex>  writes <dir>/<file>.pdf, and with
 #   --keep-logs also <dir>/<file>.log reporting FAKE_PAGES pages (default 1).
 #   FAKE_TECTONIC_WARN=1 prints a warning of tectonic's own on stderr.
+#   A line "%FAKE_PAGES=<n>" in the .tex (the last one wins) overrides FAKE_PAGES.
 set -euo pipefail
 keep=""
 if [ "$1" = "--keep-logs" ]; then keep=1; shift; fi
@@ -10,8 +11,9 @@ if [ "$1" = "--keep-logs" ]; then keep=1; shift; fi
 mkdir -p "$2"
 base="$(basename "${3%.tex}")"
 printf '%%PDF-1.4 fake\n' > "$2/$base.pdf"
+pages="$(sed -n 's/^%FAKE_PAGES=\([0-9]*\)$/\1/p' "$3" | tail -1)"
 if [ -n "$keep" ]; then
-  printf 'Output written on %s.xdv (%s page, 100 bytes).\n' "$base" "${FAKE_PAGES:-1}" > "$2/$base.log"
+  printf 'Output written on %s.xdv (%s page, 100 bytes).\n' "$base" "${pages:-${FAKE_PAGES:-1}}" > "$2/$base.log"
 fi
 if [ -n "${FAKE_TECTONIC_WARN:-}" ]; then
   echo "warning: warnings were issued by the TeX engine; use --print and/or --keep-logs for details." >&2

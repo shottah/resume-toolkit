@@ -63,6 +63,33 @@ resume_pages() {
   fi
 }
 
+# page_limit <file.tex>
+# Print how many pages a document may have: resume_pages for resume.tex,
+# otherwise 1.
+page_limit() {
+  if [ "$(basename "$1")" = resume.tex ]; then resume_pages; else echo 1; fi
+}
+
+# pdf_pages <file.tex>
+# Print the page count of the last build, read from tectonic's log in
+# <dir>/out/<name>.log (written with --keep-logs). Prints nothing if unknown.
+pdf_pages() {
+  local log
+  log="$(dirname "$1")/out/$(basename "$1" .tex).log"
+  [ -f "$log" ] || return 0
+  sed -n 's/.*Output written on .* (\([0-9][0-9]*\) pages\{0,1\}.*/\1/p' "$log" | head -1
+}
+
+# page_lines <file.tex> <page>
+# Print how many lines of text that page of the built PDF has. Needs pdftotext
+# (or $PDFTOTEXT); prints nothing when it isn't installed.
+page_lines() {
+  local pdf tool="${PDFTOTEXT:-pdftotext}"
+  pdf="$(dirname "$1")/out/$(basename "$1" .tex).pdf"
+  [ -f "$pdf" ] && command -v "$tool" >/dev/null 2>&1 || return 0
+  "$tool" -f "$2" -l "$2" -layout "$pdf" - 2>/dev/null | grep -c '[^[:space:]]' || true
+}
+
 # fit_gate_warning <notes.md>
 # Warn on stderr when the fit score is below 7 (see "Fit gate" in CLAUDE.md).
 fit_gate_warning() {

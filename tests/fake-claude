@@ -9,6 +9,9 @@
 #   FAKE_CHATTER tailor mode: text to print on stdout, like the real CLI's final message
 #   FAKE_FAIL    exit with this code after recording the call
 #   FAKE_REPLY   re-check mode: print this instead of a well-formed fit result
+#   FAKE_FIT_TO  length mode: append "%FAKE_PAGES=<n>" to the .tex being fitted, so
+#                tests/fake-tectonic reports n pages next time (default: no change)
+# Every call appends its mode (scaffold, recheck, tailor, length, other) to FAKE_LOG/calls.
 set -euo pipefail
 
 log="${FAKE_LOG:?FAKE_LOG must be set}"
@@ -31,8 +34,16 @@ case "$prompt" in
   Scaffold*) mode=scaffold ;;
   Re-score*) mode=recheck ;;
   *"You are tailoring"*) mode=tailor ;;
+  "Adjust the length"*) mode=length ;;
   *) mode=other ;;
 esac
+
+printf '%s\n' "$mode" >> "$log/calls"
+
+if [ "$mode" = length ] && [ -n "${FAKE_FIT_TO:-}" ]; then
+  file="$(printf '%s\n' "$prompt" | sed -n 's/^File: *//p' | head -1)"
+  printf '%%FAKE_PAGES=%s\n' "$FAKE_FIT_TO" >> "$file"
+fi
 
 if [ "$mode" = scaffold ] && [ -n "${FAKE_DIR:-}" ]; then
   mkdir -p "$FAKE_DIR"

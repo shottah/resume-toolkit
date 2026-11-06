@@ -158,6 +158,17 @@ updates only those four lines. If you can't honestly bridge the gap, press
 Ctrl-C to stop before the documents are written. Often the fix is adding
 real experience to `source/` that you had left out.
 
+## Fitting the page
+
+Claude can't see how long the PDF comes out while it writes, so after each
+build `scripts/fit-length.sh` measures it. If a document runs over its page
+limit, Claude gets one more pass on the `.tex` file, told how many pages it
+came to: it tightens the summary, merges roles at the same company, puts
+education and skills on single lines, and only then drops the least relevant
+bullets (never below three for a current role). A two-page resume whose second
+page is mostly empty gets filled with more of your real highlights instead.
+It tries at most twice, and it never touches fonts or margins.
+
 ## Checks after each build
 
 Every time a PDF is built, `scripts/check.sh` looks for three common problems

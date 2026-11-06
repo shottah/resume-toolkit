@@ -697,6 +697,71 @@ test_command_apply_counts_warnings() {
   assert_contains sum "warnings: 2"
 }
 
+# ---- fitting the page length (scripts/fit-length.sh) ----------------------------
+
+# Build the resume for applications/a through make, with the fakes.
+run_make_resume() {
+  mkdir -p applications/a
+  printf 'Fake job description.\n' > applications/a/job-description.md
+  CLAUDE="$FAKE" TECTONIC="$FAKE_TEX" PDFTOTEXT="$FAKE_PDFTOTEXT" FAKE_LOG="$PWD/log" \
+    FAKE_OUTPUT=applications/a/resume.tex \
+    make --no-print-directory resume DIR=applications/a >out 2>&1
+}
+
+test_fit_length_not_called_when_it_fits() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"
+  FAKE_PAGES=1 run_make_resume || fail "make resume failed: $(cat out)"
+  assert_not_contains log/calls "length"
+}
+
+test_fit_length_shortens_an_overlong_resume() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"
+  FAKE_PAGES=2 FAKE_FIT_TO=1 run_make_resume || fail "make resume failed: $(cat out)"
+  assert_eq 1 "$(grep -c '^length$' log/calls)" "length calls"
+  assert_contains log/prompt "compiled to 2 pages"
+  assert_contains log/prompt "File: applications/a/resume.tex"
+  assert_contains log/prompt "Do not change the preamble"
+  assert_eq "Read,Edit,Glob,Grep" "$(grep -A1 -x -- '--tools' log/args | tail -1)" "length --tools"
+  assert_not_contains out "runs to"
+}
+
+test_fit_length_gives_up_after_two_tries() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"
+  FAKE_PAGES=2 run_make_resume || fail "make resume failed: $(cat out)"
+  assert_eq 2 "$(grep -c '^length$' log/calls)" "length calls"
+  assert_contains out "runs to 2 pages (keep it to 1)"
+}
+
+test_fit_length_fills_a_nearly_empty_second_page() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"
+  cp -R example/source source
+  printf 'resume_pages: 2\n' > source/preferences.yaml
+  FAKE_PAGES=2 FAKE_P1_LINES=55 FAKE_P2_LINES=9 run_make_resume || fail "make resume failed: $(cat out)"
+  assert_contains log/calls "length"
+  assert_contains log/prompt "Page 2 has only 9 lines"
+}
+
+test_fit_length_keeps_two_page_resume_that_fits() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"
+  cp -R example/source source
+  printf 'resume_pages: 2\n' > source/preferences.yaml
+  FAKE_PAGES=2 FAKE_P2_LINES=40 run_make_resume || fail "make resume failed: $(cat out)"
+  assert_not_contains log/calls "length"
+}
+
+test_fit_length_cover_letter_one_page_even_with_two_page_resumes() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"
+  cp -R example/source source
+  printf 'resume_pages: 2\n' > source/preferences.yaml
+  mkdir -p applications/a
+  printf 'Fake job description.\n' > applications/a/job-description.md
+  CLAUDE="$FAKE" TECTONIC="$FAKE_TEX" FAKE_LOG="$PWD/log" FAKE_PAGES=2 FAKE_FIT_TO=1 \
+    FAKE_OUTPUT=applications/a/cover-letter.tex \
+    make --no-print-directory cover-letter DIR=applications/a >out 2>&1 || fail "make failed: $(cat out)"
+  assert_contains log/calls "length"
+  assert_contains log/prompt "the limit is 1 page"
+}
+
 # ---- runner -----------------------------------------------------------------
 
 passed=0
