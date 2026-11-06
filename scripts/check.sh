@@ -3,7 +3,10 @@
 #
 #   scripts/check.sh <file.tex>
 #
-# Checks: the PDF runs past one page (read from tectonic's log in <dir>/out/),
+# Checks: the PDF runs past its page limit (read from tectonic's log in
+# <dir>/out/; one page, or two for a resume with "resume_pages: 2" in
+# source/preferences.yaml), a two-page resume whose second page is mostly empty
+# (only when pdftotext is installed),
 # stock phrases from scripts/stock-phrases.txt that your source/ doesn't use,
 # and numbers (percentages, money, multipliers, counts) that don't appear in
 # source/. Each problem is one line on stderr starting with "warning: ".
@@ -18,11 +21,32 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 warn() { echo "warning: $TEX: $*" >&2; }
 
 # ---- pages ------------------------------------------------------------------
-LOG="$(dirname "$TEX")/out/$(basename "$TEX" .tex).log"
+# Resumes may run to 2 pages when source/preferences.yaml says "resume_pages: 2";
+# everything else is one page.
+LIMIT=1
+if [ "$(basename "$TEX")" = resume.tex ]; then
+  LIMIT="$(source "$HERE/lib.sh"; resume_pages)"
+fi
+OUT="$(dirname "$TEX")/out"
+LOG="$OUT/$(basename "$TEX" .tex).log"
+PDF="$OUT/$(basename "$TEX" .tex).pdf"
+pages=""
 if [ -f "$LOG" ]; then
   pages="$(sed -n 's/.*Output written on .* (\([0-9][0-9]*\) pages\{0,1\}.*/\1/p' "$LOG" | head -1)"
-  if [ -n "$pages" ] && [ "$pages" -gt 1 ]; then
-    warn "runs to $pages pages (keep it to one)"
+fi
+if [ -n "$pages" ] && [ "$pages" -gt "$LIMIT" ]; then
+  if [ "$LIMIT" = 1 ]; then
+    warn "runs to $pages pages (keep it to 1)"
+  else
+    warn "runs to $pages pages (keep it to $LIMIT)"
+  fi
+elif [ "$LIMIT" = 2 ] && [ "$pages" = 2 ] && [ -f "$PDF" ] &&
+     command -v "${PDFTOTEXT:-pdftotext}" >/dev/null 2>&1; then
+  # A second page with less than half as much text as the first looks like overflow.
+  p1="$("${PDFTOTEXT:-pdftotext}" -f 1 -l 1 -layout "$PDF" - 2>/dev/null | grep -c '[^[:space:]]' || true)"
+  p2="$("${PDFTOTEXT:-pdftotext}" -f 2 -l 2 -layout "$PDF" - 2>/dev/null | grep -c '[^[:space:]]' || true)"
+  if [ "${p1:-0}" -gt 0 ] && [ $((p2 * 2)) -lt "$p1" ]; then
+    warn "second page is mostly empty ($p2 lines against $p1 on page 1): fill it or cut to one page"
   fi
 fi
 

@@ -2,12 +2,12 @@
 
 [![test](https://github.com/shottah/resume-toolkit/actions/workflows/test.yml/badge.svg)](https://github.com/shottah/resume-toolkit/actions/workflows/test.yml)
 
-**A tailored, one-page resume and cover letter for every job, written by
+**A tailored resume and cover letter for every job, written by
 Claude Code from your own career history, and never padded with things you
 haven't done.**
 
 Write your career history once, as YAML. Point the tool at a job description
-and Claude writes a tailored, one-page resume and cover letter in LaTeX, which
+and Claude writes a tailored resume and cover letter in LaTeX, which
 [tectonic](https://tectonic-typesetting.github.io/) compiles to PDF. Before
 it writes anything, it scores how well the job fits your experience and lists
 the gaps.
@@ -20,8 +20,9 @@ the gaps.
   If it isn't in `source/`, it isn't on the page.
 - **It tells you when a job isn't a fit.** Each job gets a 1–10 fit score and
   a list of the must-haves you can't show, before any time goes into writing.
-- **One page, ATS-friendly, every time.** Single column, standard fonts, clean
-  LaTeX you can edit.
+- **The right length, ATS-friendly.** One page by default, two for a long
+  career if you choose, and it warns when a document runs over. Single column,
+  standard fonts, clean LaTeX you can edit.
 - **It can't run commands on your machine.** Claude works with a restricted
   toolset and no shell, so a hostile job posting can't make it do anything.
 - **Your data stays yours.** Your profile and applications are git-ignored;
@@ -101,6 +102,16 @@ for a job in one of those places it adds "Relocating to <place>", and the
 cover letter repeats your `work_authorization` statement word for word. It
 never says anything about relocation or visas that `profile.yaml` doesn't.
 
+Resumes are one page by default. With a long history, add this line to
+`source/preferences.yaml` to allow two:
+
+```yaml
+resume_pages: 2
+```
+
+Claude then uses two full pages, keeping page 1 strong enough to stand on its
+own. Cover letters always stay on one page.
+
 Any other file you add to `source/`, such as `certifications.yaml`, is read
 as more facts. The one exception is `preferences.yaml`: put your own rules
 there, such as titles you never use, claims to avoid, or what to emphasize.
@@ -152,7 +163,9 @@ real experience to `source/` that you had left out.
 Every time a PDF is built, `scripts/check.sh` looks for three common problems
 and prints a warning for each one it finds. It never stops the build:
 
-- the document runs past one page;
+- the document runs past one page (two for a resume when `resume_pages: 2`
+  is set), or, if `pdftotext` is installed, a two-page resume's second page
+  is mostly empty;
 - a stock phrase such as "proven track record" or "spearheaded" appears that
   your own `source/` doesn't use (the list is in `scripts/stock-phrases.txt`);
 - a number such as "40%", "$1.2M", "3x" or "12 engineers" appears that isn't

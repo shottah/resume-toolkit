@@ -11,13 +11,13 @@ REQUIRED READING (in this order):
   4. {{JD_INSTRUCTION}}
 
 TASK:
-Write a tailored, one-page LaTeX {{KIND_NOUN}} to:
+Write a tailored LaTeX {{KIND_NOUN}} to:
   {{OUTPUT}}
 
 RULES:
   - Output MUST be valid LaTeX that compiles with tectonic (no extra packages
     beyond what {{TEMPLATE}} already loads).
-  - Result MUST fit on ONE page.
+{{PAGE_RULE}}
   - ATS-friendly: single column, no graphics, no color, standard fonts.
   - Facts come only from source/. Do not invent facts.
   - Never promise anything source/ doesn't state: no availability, start

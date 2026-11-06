@@ -79,7 +79,19 @@ else
   exit 1
 fi
 
+if [ "$KIND" = resume ] && [ "$(resume_pages)" = 2 ]; then
+  PAGE_RULE="  - The resume runs to two full pages: aim for 1.5 to 2 pages, and never
+    leave page 2 nearly empty. Page 1 must stand on its own: the summary and
+    the roles most relevant to this job. Older or less relevant roles,
+    education and skills can go on page 2. Use the extra space for more of
+    the candidate's real highlights, especially in current roles, never for
+    padding, longer bullets or repeated claims."
+else
+  PAGE_RULE="  - Result MUST fit on ONE page."
+fi
+
 PROMPT=$(render_prompt "$(dirname "$0")/prompts/tailor.md" \
+  "PAGE_RULE=${PAGE_RULE}" \
   "JD_CACHE=${JD_CACHE}" \
   "JD_INSTRUCTION=${JD_INSTRUCTION}" \
   "KIND_NOUN=${KIND_NOUN}" \

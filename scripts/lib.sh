@@ -52,6 +52,17 @@ ensure_source() {
   exit 1
 }
 
+# resume_pages
+# Print the page length set for resumes: 2 when source/preferences.yaml (or
+# .yml) has the line "resume_pages: 2", otherwise 1. Cover letters are always 1.
+resume_pages() {
+  if grep -qsE '^resume_pages:[[:space:]]*2[[:space:]]*(#.*)?$' source/preferences.yaml source/preferences.yml; then
+    echo 2
+  else
+    echo 1
+  fi
+}
+
 # fit_gate_warning <notes.md>
 # Warn on stderr when the fit score is below 7 (see "Fit gate" in CLAUDE.md).
 fit_gate_warning() {

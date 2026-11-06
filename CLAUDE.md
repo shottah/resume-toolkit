@@ -38,7 +38,8 @@ of truth, then compiles it to PDF with tectonic.
   - `scaffold.sh`  — creates the application folder from a job description and scores the fit
   - `tailor.sh`    — runs `claude -p` to write a tailored resume or cover letter
   - `recheck.sh`   — re-scores an existing application; updates only the four `fit_*` lines
-  - `check.sh`     — after each PDF build, warns about extra pages, stock phrases
+  - `check.sh`     — after each PDF build, warns about extra pages (or a nearly
+    empty second page, when `pdftotext` is installed), stock phrases
     (`stock-phrases.txt`) and numbers not found in `source/`; never fails the build
   - `command.sh`   — runs `fit` or `apply` for the Claude Code commands and prints only a summary
   - `lib.sh`       — shared helpers (prompt rendering, first-run setup)
@@ -92,7 +93,9 @@ make test                                              # run the script tests
 - Bullet points lead with a strong past-tense verb and include metrics where
   possible.
 - Prioritize relevance to the job description over recency.
-- The resume and the cover letter each fit on **one page**.
+- The cover letter fits on **one page**. The resume fits on one page too,
+  unless `source/preferences.yaml` has `resume_pages: 2`; then it uses two
+  full pages, with page 1 standing on its own.
 - ATS-friendly: single column, no graphics, no color, standard fonts.
 
 ## Conventions

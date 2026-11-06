@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Stand-in for pdftotext, used by tests/run.sh: `-f N -l N ... <file.pdf> -`
+# prints FAKE_P1_LINES (default 50) or FAKE_P2_LINES (default 50) lines for page N.
+set -euo pipefail
+page=1
+while [ $# -gt 0 ]; do
+  [ "$1" = "-f" ] && page="$2"
+  shift
+done
+case "$page" in 1) n="${FAKE_P1_LINES:-50}" ;; *) n="${FAKE_P2_LINES:-50}" ;; esac
+i=0
+while [ "$i" -lt "$n" ]; do echo "line $i of page $page"; i=$((i + 1)); done

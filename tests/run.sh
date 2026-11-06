@@ -6,6 +6,7 @@ set -u
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 FAKE="$ROOT/tests/fake-claude"
 FAKE_TEX="$ROOT/tests/fake-tectonic"
+FAKE_PDFTOTEXT="$ROOT/tests/fake-pdftotext"
 
 # ---- helpers ----------------------------------------------------------------
 
@@ -122,6 +123,22 @@ capture_prompts() {
     bash scripts/tailor.sh cover-letter applications/a jd.md >/dev/null
   CLAUDE="$FAKE" FAKE_LOG="$PWD/ls" FAKE_DIR=applications/b \
     bash scripts/scaffold.sh jd.md >/dev/null 2>&1
+}
+
+test_tailor_one_page_by_default() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"; capture_prompts
+  assert_contains lt/prompt "MUST fit on ONE page"
+  assert_contains lc/prompt "MUST fit on ONE page"
+}
+
+test_tailor_two_page_resume_when_set() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"
+  cp -R example/source source
+  printf 'resume_pages: 2\n' > source/preferences.yaml
+  capture_prompts
+  assert_contains lt/prompt "two full pages"
+  assert_not_contains lt/prompt "MUST fit on ONE page"
+  assert_contains lc/prompt "MUST fit on ONE page"
 }
 
 test_tailor_has_writing_rules() {
@@ -536,6 +553,50 @@ test_check_silent_on_one_page() {
   local tmp; tmp="$(fresh_copy)"; cd "$tmp"; make_tex "Built things." 1
   run_check
   assert_not_contains err "pages"
+}
+
+run_check2() { # resume_pages: 2, fake pdftotext
+  printf 'resume_pages: 2\n' > source/preferences.yaml
+  : > applications/z/out/resume.pdf
+  PDFTOTEXT="$FAKE_PDFTOTEXT" bash scripts/check.sh applications/z/resume.tex >out 2>err
+}
+
+test_check_allows_two_pages_when_set() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"; make_tex "Built things." 2
+  FAKE_P2_LINES=40 run_check2
+  assert_not_contains err "pages"
+  assert_not_contains err "second page"
+}
+
+test_check_warns_three_pages_when_two_allowed() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"; make_tex "Built things." 3
+  run_check2
+  assert_contains err "runs to 3 pages (keep it to 2)"
+}
+
+test_check_warns_mostly_empty_second_page() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"; make_tex "Built things." 2
+  FAKE_P1_LINES=55 FAKE_P2_LINES=9 run_check2
+  assert_contains err "second page is mostly empty"
+}
+
+test_check_skips_second_page_check_without_pdftotext() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"; make_tex "Built things." 2
+  printf 'resume_pages: 2\n' > source/preferences.yaml
+  : > applications/z/out/resume.pdf
+  local rc=0
+  PDFTOTEXT=/nonexistent/pdftotext bash scripts/check.sh applications/z/resume.tex >out 2>err || rc=$?
+  assert_eq 0 "$rc" "exit code"
+  assert_not_contains err "second page"
+}
+
+test_check_cover_letter_stays_one_page() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"; make_tex "Built things."
+  printf 'resume_pages: 2\n' > source/preferences.yaml
+  cp applications/z/resume.tex applications/z/cover-letter.tex
+  printf 'Output written on cover-letter.xdv (2 pages, 100 bytes).\n' > applications/z/out/cover-letter.log
+  bash scripts/check.sh applications/z/cover-letter.tex >out 2>err
+  assert_contains err "runs to 2 pages (keep it to 1)"
 }
 
 test_check_silent_without_log() {
