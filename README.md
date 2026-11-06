@@ -180,3 +180,6 @@ it run commands on your machine.
 ## License
 
 [MIT](LICENSE)
+
+Some writing and fit-scoring ideas were inspired by
+[career-ops](https://github.com/career-ops-hq/career-ops).
