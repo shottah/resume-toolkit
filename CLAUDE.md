@@ -9,7 +9,8 @@ of truth, then compiles it to PDF with tectonic.
 - `source/` — your own YAML files: the **single source of truth** for all
   professional data. Git-ignored, so it is never published. On the first run
   it is created as a copy of `example/source/`.
-  - `profile.yaml`     — name, contact details, summary
+  - `profile.yaml`     — name, contact details, summary, optional `relocation`
+    places (each with `place`, optional `when` and `work_authorization`)
   - `experience.yaml`  — work history with highlights and tags
   - `education.yaml`   — degrees and courses
   - `skills.yaml`      — skill groupings
@@ -40,6 +41,7 @@ of truth, then compiles it to PDF with tectonic.
   - `command.sh`   — runs `fit` or `apply` for the Claude Code commands and prints only a summary
   - `lib.sh`       — shared helpers (prompt rendering, first-run setup)
   - `prompts/`     — the instructions sent to Claude; edit these to change its behavior
+    (`rules-resume.md` and `rules-cover-letter.md` hold the rules for one document only)
     (`fit-rules.md` holds the scoring rules shared by the first check and re-checks)
 - `docs/images/` — README images, made from a real run on the example profile.
 - `tests/` — script tests (`make test`); they use a fake `claude`, so they

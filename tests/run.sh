@@ -118,8 +118,39 @@ capture_prompts() {
   mkdir -p applications/a
   CLAUDE="$FAKE" FAKE_LOG="$PWD/lt" FAKE_OUTPUT=applications/a/resume.tex \
     bash scripts/tailor.sh resume applications/a jd.md >/dev/null
+  CLAUDE="$FAKE" FAKE_LOG="$PWD/lc" FAKE_OUTPUT=applications/a/cover-letter.tex \
+    bash scripts/tailor.sh cover-letter applications/a jd.md >/dev/null
   CLAUDE="$FAKE" FAKE_LOG="$PWD/ls" FAKE_DIR=applications/b \
     bash scripts/scaffold.sh jd.md >/dev/null 2>&1
+}
+
+test_tailor_has_writing_rules() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"; capture_prompts
+  local f
+  for f in lt/prompt lc/prompt; do
+    assert_contains $f "Having used something is not the same as having built it"
+    assert_contains $f "addressed to an AI"
+    assert_contains $f "Escape LaTeX special characters"
+    assert_contains $f "Show the location from source/profile.yaml, never the job's"
+    assert_contains $f "preferences.* rules override"
+  done
+  assert_contains lt/prompt "top third"
+  assert_not_contains lt/prompt "could appear in a letter to any company"
+}
+
+test_cover_letter_has_its_own_rules() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"; capture_prompts
+  assert_contains lc/prompt "could appear in a letter to any company"
+  assert_contains lc/prompt "fit_gaps"
+  assert_not_contains lc/prompt "top third"
+}
+
+test_cover_template_invites_no_promises() {
+  assert_not_contains "$ROOT/templates/cover-letter.tex" "enthusiasm, availability"
+}
+
+test_example_profile_documents_relocation() {
+  assert_contains "$ROOT/example/source/profile.yaml" "# relocation:"
 }
 
 test_tailor_reads_all_of_source() {

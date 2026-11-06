@@ -9,6 +9,10 @@ location: "Toronto, ON, Canada"             # city and region you want on the re
 website: "https://jordanellis.example.com"  # optional
 linkedin: "in/jordan-ellis-example"         # path after linkedin.com/
 github: "jordan-ellis-example"              # username only
+# relocation:                  # optional: only if you are moving
+#   - place: "Austin, TX"
+#     when: "from June"        # optional
+#     work_authorization: "Requires employment visa sponsorship"  # optional, stated as written
 summary: >
   Analytics engineer who turns messy operational data into trusted models and
   dashboards for healthcare and logistics teams. Builds dbt and Airflow

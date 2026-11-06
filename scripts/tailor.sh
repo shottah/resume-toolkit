@@ -29,11 +29,13 @@ case "$KIND" in
     OUTPUT="$DIR/resume.tex"
     TEMPLATE="templates/resume.tex"
     KIND_NOUN="resume"
+    KIND_RULES_FILE="rules-resume.md"
     ;;
   cover-letter)
     OUTPUT="$DIR/cover-letter.tex"
     TEMPLATE="templates/cover-letter.tex"
     KIND_NOUN="cover letter"
+    KIND_RULES_FILE="rules-cover-letter.md"
     ;;
   *)
     echo "error: unknown kind '$KIND' (expected: resume | cover-letter)" >&2
@@ -81,6 +83,7 @@ PROMPT=$(render_prompt "$(dirname "$0")/prompts/tailor.md" \
   "JD_CACHE=${JD_CACHE}" \
   "JD_INSTRUCTION=${JD_INSTRUCTION}" \
   "KIND_NOUN=${KIND_NOUN}" \
+  "KIND_RULES=$(cat "$(dirname "$0")/prompts/${KIND_RULES_FILE}")" \
   "OUTPUT=${OUTPUT}" \
   "TEMPLATE=${TEMPLATE}")
 

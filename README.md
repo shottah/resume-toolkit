@@ -85,7 +85,7 @@ Edit the files in `source/`:
 
 | File | What goes in it |
 |---|---|
-| `profile.yaml` | name, contact details, a short summary |
+| `profile.yaml` | name, contact details, a short summary, and optional `relocation` places |
 | `experience.yaml` | each role, with every highlight worth mentioning, plus tags |
 | `education.yaml` | degrees and courses |
 | `skills.yaml` | skills grouped by category |
@@ -94,6 +94,12 @@ Edit the files in `source/`:
 Write down more than fits on one page. Claude picks the most relevant
 highlights for each job, so a fuller `source/` gives better results. It
 never invents facts: if something isn't in `source/`, it won't appear.
+
+If you're moving, list the places under `relocation` in `profile.yaml`
+(there's a commented example). Your resume always shows your real location;
+for a job in one of those places it adds "Relocating to <place>", and the
+cover letter repeats your `work_authorization` statement word for word. It
+never says anything about relocation or visas that `profile.yaml` doesn't.
 
 Any other file you add to `source/`, such as `certifications.yaml`, is read
 as more facts. The one exception is `preferences.yaml`: put your own rules
@@ -144,8 +150,10 @@ real experience to `source/` that you had left out.
 ## Changing how Claude writes
 
 The instructions Claude follows are plain text in `scripts/prompts/`:
-`tailor.md` writes the resume and cover letter, and `scaffold.md` creates the
-application folder and scores the fit. The layout and styling come from
+`tailor.md` writes the resume and cover letter (with `rules-resume.md` and
+`rules-cover-letter.md` for rules that apply to only one of them),
+`scaffold.md` creates the application folder, and `fit-rules.md` holds the
+fit-scoring rules. The layout and styling come from
 `templates/resume.tex` and `templates/cover-letter.tex`. Edit any of them in
 your own fork to change tone, length, emphasis or design.
 
