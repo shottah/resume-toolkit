@@ -65,7 +65,7 @@ if [ "$mode" = recheck ]; then
   if [ -n "${FAKE_REPLY:-}" ]; then
     printf '%s\n' "$FAKE_REPLY"
   else
-    printf 'fit_score: %s\nfit_gaps: ["Fake gap"]\n' "${FAKE_FIT:-8}"
+    printf 'fit_score: %s\nfit_gaps: ["Fake gap"]\nfit_minor_gaps: []\nfit_confidence: high\n' "${FAKE_FIT:-8}"
   fi
 fi
 

@@ -121,14 +121,25 @@ out.
 
 ## The fit check
 
-`make application` first scores the job against `source/` from 1 to 10 and
-lists the must-haves your `source/` doesn't cover, in `notes.md` as
-`fit_score` and `fit_gaps`. Below 7 it prints a warning and carries on.
-After you add experience to `source/`, `make fit DIR=<app-dir>` re-checks an
-existing application and updates only those two lines. If
-you can't honestly bridge the gap, press Ctrl-C to stop before the documents
-are written. Often the fix is adding real experience to `source/` that you
-had left out.
+`make application` first scores the job against `source/` from 1 to 10.
+Claude lists the job's requirements before it looks at your profile, splits
+them into blocking (required, or a hard bar such as years or work
+authorisation) and nice to have, then scores how many of the blocking ones
+you cover. Missing items don't each cost a fixed number of points. It writes
+four lines to `notes.md`:
+
+- `fit_score`: 9–10 means every blocking requirement is covered, 7–8 means
+  at most one is missing, 4–6 about half, 1–3 most.
+- `fit_gaps`: the blocking requirements your `source/` doesn't cover.
+- `fit_minor_gaps`: the nice-to-haves it doesn't cover.
+- `fit_confidence`: `high`, `medium` or `low`, depending on how clear the
+  job description is.
+
+Below 7 it prints a warning and carries on. After you add experience to
+`source/`, `make fit DIR=<app-dir>` re-checks an existing application and
+updates only those four lines. If you can't honestly bridge the gap, press
+Ctrl-C to stop before the documents are written. Often the fix is adding
+real experience to `source/` that you had left out.
 
 ## Changing how Claude writes
 

@@ -36,7 +36,7 @@ of truth, then compiles it to PDF with tectonic.
 - `scripts/` — the workflow scripts.
   - `scaffold.sh`  — creates the application folder from a job description and scores the fit
   - `tailor.sh`    — runs `claude -p` to write a tailored resume or cover letter
-  - `recheck.sh`   — re-scores an existing application; updates only `fit_score` and `fit_gaps`
+  - `recheck.sh`   — re-scores an existing application; updates only the four `fit_*` lines
   - `command.sh`   — runs `fit` or `apply` for the Claude Code commands and prints only a summary
   - `lib.sh`       — shared helpers (prompt rendering, first-run setup)
   - `prompts/`     — the instructions sent to Claude; edit these to change its behavior
@@ -114,8 +114,10 @@ company: ""
 role: ""
 url: ""
 contacts: []
-fit_score: 1-10        # written by scaffold.sh
-fit_gaps: []           # must-haves from the job description not evidenced in source/
+fit_score: 1-10        # written by scaffold.sh, updated by recheck.sh
+fit_gaps: []           # blocking requirements not evidenced in source/
+fit_minor_gaps: []     # nice-to-have requirements not evidenced in source/
+fit_confidence: high | medium | low   # how clear the job description is
 ---
 ```
 Free-form notes go below the frontmatter.

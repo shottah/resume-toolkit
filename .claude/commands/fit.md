@@ -13,10 +13,11 @@ scripts/command.sh fit "$ARGUMENTS"
 A restricted Claude with no shell reads the job description and scores it
 against `source/` from 1 to 10. For a job link or file it creates the
 application folder; for an existing `applications/` folder it re-checks the
-fit and updates only the score and gaps.
+fit and updates only the fit lines.
 
 When it finishes, tell the user in a few short lines: the company and role,
-the fit score, and the gaps. If the score is 7 or higher, suggest
+the fit score and its confidence, the blocking gaps, and the nice-to-have
+gaps if there are any. If the score is 7 or higher, suggest
 `/apply <folder>` with the folder it printed. If the summary includes a note
 about low fit, pass it on and suggest they only go ahead if they can name
 what bridges the gap.

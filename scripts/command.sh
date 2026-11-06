@@ -61,6 +61,8 @@ echo "company: $(field company)"
 echo "role: $(field role)"
 echo "fit_score: $(field fit_score)"
 echo "fit_gaps: $(field fit_gaps)"
+echo "fit_minor_gaps: $(field fit_minor_gaps)"
+echo "fit_confidence: $(field fit_confidence)"
 FIT="$(field fit_score)"
 if [[ "$FIT" =~ ^[0-9]+$ ]] && [ "$FIT" -lt 7 ]; then
   echo "note: fit is below 7 — see 'Fit gate' in CLAUDE.md before investing time"

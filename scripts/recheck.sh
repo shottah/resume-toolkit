@@ -3,11 +3,13 @@
 #
 #   scripts/recheck.sh <application-folder>
 #
-# Updates only the fit_score and fit_gaps lines in <folder>/notes.md. The stage,
-# your notes, contacts and any built documents are left alone. Claude gets
-# read-only tools, so it cannot change any file itself.
+# Updates only the fit lines in <folder>/notes.md: fit_score, fit_gaps,
+# fit_minor_gaps and fit_confidence (the last two are added after fit_gaps when
+# an older notes.md lacks them). The stage, your notes, contacts and any built
+# documents are left alone. Claude gets read-only tools, so it cannot change
+# any file itself.
 #
-# Stdout: the two new lines (fit_score and fit_gaps). Stderr: progress and warnings.
+# Stdout: the four new lines. Stderr: progress and warnings.
 
 set -euo pipefail
 
@@ -35,23 +37,40 @@ REPLY=$("${CLAUDE:-claude}" -p "$PROMPT" \
   --tools Read,Glob,Grep \
   --permission-mode bypassPermissions)
 
-SCORE_LINE=$(printf '%s\n' "$REPLY" | tr -d '\r' | grep -E '^fit_score: *([1-9]|10) *$' | head -1 || true)
-GAPS_LINE=$(printf '%s\n' "$REPLY" | tr -d '\r' | grep -E '^fit_gaps: *\[.*\] *$' | head -1 || true)
-if [ -z "$SCORE_LINE" ] || [ -z "$GAPS_LINE" ]; then
+CLEAN=$(printf '%s\n' "$REPLY" | tr -d '\r')
+SCORE_LINE=$(printf '%s\n' "$CLEAN" | grep -E '^fit_score: *([1-9]|10) *$' | head -1 || true)
+GAPS_LINE=$(printf '%s\n' "$CLEAN" | grep -E '^fit_gaps: *\[.*\] *$' | head -1 || true)
+MINOR_LINE=$(printf '%s\n' "$CLEAN" | grep -E '^fit_minor_gaps: *\[.*\] *$' | head -1 || true)
+CONFIDENCE=$(printf '%s\n' "$CLEAN" | grep -iE '^fit_confidence: *(high|medium|low) *$' | head -1 |
+  sed 's/^[^:]*: *//; s/ *$//' | tr '[:upper:]' '[:lower:]' || true)
+if [ -z "$SCORE_LINE" ] || [ -z "$GAPS_LINE" ] || [ -z "$MINOR_LINE" ] || [ -z "$CONFIDENCE" ]; then
   echo "error: unexpected reply from claude; ${NOTES} was not changed" >&2
   exit 1
 fi
+CONF_LINE="fit_confidence: $CONFIDENCE"
 
-# Replace the two lines inside the frontmatter only (adding them if missing),
-# then swap the file in so a failure never leaves it half-written.
+# Replace the fit lines inside the frontmatter only. Missing minor-gaps and
+# confidence lines go right after fit_gaps; anything else missing goes before
+# the closing ---. The file is swapped in so a failure never leaves it half-written.
 tmp="${NOTES}.tmp.$$"
-S="$SCORE_LINE" G="$GAPS_LINE" awk '
-  NR == 1 && $0 == "---" { fm = 1; print; next }
-  fm && $0 == "---"      { if (!s) print ENVIRON["S"]; if (!g) print ENVIRON["G"]; fm = 0; print; next }
-  fm && /^fit_score:/    { print ENVIRON["S"]; s = 1; next }
-  fm && /^fit_gaps:/     { print ENVIRON["G"]; g = 1; next }
-                         { print }
+S="$SCORE_LINE" G="$GAPS_LINE" M="$MINOR_LINE" C="$CONF_LINE" awk '
+  NR == 1 && $0 == "---"     { fm = 1; print; next }
+  fm && $0 == "---"          {
+                               if (!s) print ENVIRON["S"]; if (!g) print ENVIRON["G"]
+                               if (!m) print ENVIRON["M"]; if (!c) print ENVIRON["C"]
+                               fm = 0; print; next
+                             }
+  fm && /^fit_score:/        { print ENVIRON["S"]; s = 1; next }
+  fm && /^fit_gaps:/         {
+                               print ENVIRON["G"]; g = 1
+                               if (!m) { print ENVIRON["M"]; m = 1 }
+                               if (!c) { print ENVIRON["C"]; c = 1 }
+                               next
+                             }
+  fm && /^fit_minor_gaps:/   { if (!m) print ENVIRON["M"]; m = 1; next }
+  fm && /^fit_confidence:/   { if (!c) print ENVIRON["C"]; c = 1; next }
+                             { print }
 ' "$NOTES" > "$tmp" && mv "$tmp" "$NOTES"
 
-printf '%s\n%s\n' "$SCORE_LINE" "$GAPS_LINE"
+printf '%s\n%s\n%s\n%s\n' "$SCORE_LINE" "$GAPS_LINE" "$MINOR_LINE" "$CONF_LINE"
 fit_gate_warning "$NOTES"

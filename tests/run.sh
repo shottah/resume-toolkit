@@ -283,6 +283,7 @@ test_command_fit_prints_summary_only() {
   assert_contains sum "company: Fake Co"
   assert_contains sum "fit_score: 8"
   assert_contains sum "fit_gaps: [Fake gap]"
+  assert_contains sum "fit_confidence: high"
   assert_not_contains sum "Fake job description"
   [ ! -e applications/b/resume.tex ] || fail "fit must not write documents"
 }
@@ -389,9 +390,33 @@ test_recheck_updates_only_fit_lines() {
   FAKE_FIT=9 run_recheck applications/x
   assert_contains applications/x/notes.md "fit_score: 9"
   assert_contains applications/x/notes.md 'fit_gaps: ["Fake gap"]'
-  diff before.md applications/x/notes.md | grep '^[<>]' | grep -v -E '^[<>] fit_(score|gaps):' && fail "other lines changed"
+  assert_contains applications/x/notes.md "fit_confidence: high"
+  diff before.md applications/x/notes.md | grep '^[<>]' | grep -v -E '^[<>] fit_(score|gaps|minor_gaps|confidence):' && fail "other lines changed"
   assert_contains applications/x/notes.md "stage: ready"
   assert_contains applications/x/notes.md "My own notes stay."
+}
+
+test_recheck_inserts_new_fields_after_gaps() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"; make_app_folder
+  run_recheck applications/x
+  assert_eq "fit_minor_gaps: []" "$(grep -A1 '^fit_gaps:' applications/x/notes.md | tail -1)" "line after fit_gaps"
+  assert_eq "fit_confidence: high" "$(grep -A2 '^fit_gaps:' applications/x/notes.md | tail -1)" "second line after fit_gaps"
+  assert_contains applications/x/notes.md "My own notes stay."
+}
+
+test_recheck_accepts_capitalised_confidence() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"; make_app_folder
+  FAKE_REPLY=$'fit_score: 6\nfit_gaps: []\nfit_minor_gaps: []\nfit_confidence: Medium' run_recheck applications/x
+  assert_contains applications/x/notes.md "fit_confidence: medium"
+}
+
+test_recheck_rejects_missing_confidence() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"; make_app_folder
+  cp applications/x/notes.md before.md
+  local rc=0
+  FAKE_REPLY=$'fit_score: 6\nfit_gaps: []\nfit_minor_gaps: []' run_recheck applications/x || rc=$?
+  [ "$rc" -ne 0 ] || fail "expected a non-zero exit"
+  cmp -s before.md applications/x/notes.md || fail "notes.md changed"
 }
 
 test_recheck_tools_are_read_only() {
@@ -414,7 +439,7 @@ test_recheck_rejects_malformed_reply() {
 test_recheck_rejects_out_of_range_score() {
   local tmp; tmp="$(fresh_copy)"; cd "$tmp"; make_app_folder
   local rc=0
-  FAKE_REPLY=$'fit_score: 11\nfit_gaps: []' run_recheck applications/x || rc=$?
+  FAKE_REPLY=$'fit_score: 11\nfit_gaps: []\nfit_minor_gaps: []\nfit_confidence: high' run_recheck applications/x || rc=$?
   [ "$rc" -ne 0 ] || fail "expected a non-zero exit"
   assert_contains applications/x/notes.md "fit_score: 3"
 }

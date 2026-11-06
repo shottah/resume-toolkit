@@ -34,7 +34,7 @@ application: check-deps
 	 $(MAKE) --no-print-directory cover-letter DIR="$$DIR"
 
 # Re-check an existing application's fit against your current source/.
-# Updates only fit_score and fit_gaps in its notes.md.
+# Updates only the fit_* lines in its notes.md.
 #   make fit DIR=applications/YYYY-MM-co-role
 fit:
 	@test -n "$(DIR)" || { echo "Usage: make fit DIR=applications/YYYY-MM-co-role"; exit 1; }
@@ -83,7 +83,7 @@ help:
 	@echo ""
 	@echo "  make fit          DIR=applications/YYYY-MM-co-role"
 	@echo "      Re-check an application's fit against your current source/;"
-	@echo "      updates only fit_score and fit_gaps in its notes.md."
+	@echo "      updates only the fit_* lines in its notes.md."
 	@echo ""
 	@echo "  make pdf          TEX=path/to/file.tex"
 	@echo "      Compile any .tex file to <its-dir>/out/<basename>.pdf."
