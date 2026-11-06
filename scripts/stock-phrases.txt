@@ -1,0 +1,27 @@
+# Stock phrases that make a resume or cover letter sound generic.
+# scripts/check.sh warns when one appears in a generated .tex file, unless your
+# own source/ uses it. One phrase per line, lower case; lines starting with # are ignored.
+proven track record
+results-driven
+results-oriented
+passionate about
+leveraged
+spearheaded
+utilized
+synergy
+synergies
+team player
+go-getter
+self-starter
+think outside the box
+detail-oriented
+fast-paced environment
+cutting-edge
+best-in-class
+world-class
+seamless
+hit the ground running
+i am writing to express
+excited to apply
+perfect fit
+dynamic team

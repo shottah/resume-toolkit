@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
-# Stand-in for tectonic, used by tests/run.sh: `-o <dir> <file.tex>` writes <dir>/<file>.pdf.
+# Stand-in for tectonic, used by tests/run.sh:
+#   [--keep-logs] -o <dir> <file.tex>  writes <dir>/<file>.pdf, and with
+#   --keep-logs also <dir>/<file>.log reporting FAKE_PAGES pages (default 1).
 set -euo pipefail
-[ "$1" = "-o" ] || { echo "fake-tectonic: expected -o <dir> <file.tex>" >&2; exit 2; }
+keep=""
+if [ "$1" = "--keep-logs" ]; then keep=1; shift; fi
+[ "$1" = "-o" ] || { echo "fake-tectonic: expected [--keep-logs] -o <dir> <file.tex>" >&2; exit 2; }
 mkdir -p "$2"
-printf '%%PDF-1.4 fake\n' > "$2/$(basename "${3%.tex}").pdf"
+base="$(basename "${3%.tex}")"
+printf '%%PDF-1.4 fake\n' > "$2/$base.pdf"
+if [ -n "$keep" ]; then
+  printf 'Output written on %s.xdv (%s page, 100 bytes).\n' "$base" "${FAKE_PAGES:-1}" > "$2/$base.log"
+fi

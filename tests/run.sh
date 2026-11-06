@@ -505,6 +505,105 @@ test_make_fit_rechecks() {
   assert_contains applications/x/notes.md "fit_score: 7"
 }
 
+# ---- checks after each build (scripts/check.sh) --------------------------------
+
+# Write applications/z/resume.tex with the given body inside a minimal document,
+# with the example profile as source/. Optional log page count as $2.
+make_tex() {
+  cp -R example/source source
+  mkdir -p applications/z/out
+  printf '%s\n' '\documentclass{article}' '\begin{document}' "$1" '\end{document}' > applications/z/resume.tex
+  if [ -n "${2:-}" ]; then
+    printf 'Output written on resume.xdv (%s pages, 100 bytes).\n' "$2" > applications/z/out/resume.log
+  fi
+}
+
+run_check() { bash scripts/check.sh applications/z/resume.tex >out 2>err; }
+
+test_check_warns_on_two_pages() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"; make_tex "Built things." 2
+  local rc=0; run_check || rc=$?
+  assert_eq 0 "$rc" "exit code"
+  assert_contains err "runs to 2 pages"
+}
+
+test_check_silent_on_one_page() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"; make_tex "Built things." 1
+  run_check
+  assert_not_contains err "pages"
+}
+
+test_check_silent_without_log() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"; make_tex "Built things."
+  local rc=0; run_check || rc=$?
+  assert_eq 0 "$rc" "exit code"
+  assert_not_contains err "pages"
+}
+
+test_check_flags_stock_phrase() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"; make_tex "Spearheaded the move to dbt."
+  run_check
+  assert_contains err 'stock phrase "spearheaded"'
+}
+
+test_check_ignores_phrase_in_comment() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"; make_tex "Moved to dbt. % spearheaded"
+  run_check
+  assert_not_contains err "stock phrase"
+}
+
+test_check_allows_phrase_in_source() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"; make_tex "Spearheaded the move to dbt."
+  printf '# spearheaded\n' >> source/experience.yaml
+  run_check
+  assert_not_contains err "stock phrase"
+}
+
+test_check_flags_unbacked_number() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"; make_tex 'Cut costs by 73\%.'
+  run_check
+  assert_contains err 'number "73%" not found in source/'
+}
+
+test_check_accepts_backed_escaped_percent() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"; make_tex 'Cut run time by 90\% and saved \$1.2M.'
+  run_check
+  assert_not_contains err "number"
+}
+
+test_check_ignores_years() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"; make_tex 'Analytics Engineer, 2019--2024'
+  run_check
+  assert_not_contains err "number"
+}
+
+test_check_flags_unbacked_count() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"; make_tex 'Mentored 37 analysts.'
+  run_check
+  assert_contains err 'number "37" not found in source/'
+}
+
+test_check_ignores_years_of_experience() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"; make_tex 'Engineer with 7+ years of experience and 12 years in data.'
+  run_check
+  assert_not_contains err "number"
+}
+
+test_make_pdf_runs_checks() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"; make_tex "Built things."
+  local rc=0
+  FAKE_PAGES=2 TECTONIC="$FAKE_TEX" CLAUDE="$FAKE" \
+    make --no-print-directory pdf TEX=applications/z/resume.tex >out 2>&1 || rc=$?
+  assert_eq 0 "$rc" "make pdf exit code"
+  assert_contains out "runs to 2 pages"
+}
+
+test_command_apply_counts_warnings() {
+  local tmp; tmp="$(fresh_copy)"; cd "$tmp"
+  FAKE_PAGES=2 run_command apply jd.md
+  assert_contains sum "warnings: 2"
+}
+
 # ---- runner -----------------------------------------------------------------
 
 passed=0

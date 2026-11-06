@@ -47,6 +47,7 @@ if [ "$RECHECK" = 1 ]; then
   scripts/recheck.sh "$DIR" >>"$LOG" 2>&1 || fail "the fit re-check"
 fi
 
+START=$(wc -l < "$LOG")
 if [ "$ACTION" = apply ]; then
   make --no-print-directory resume DIR="$DIR" >>"$LOG" 2>&1 || fail "writing the resume"
   make --no-print-directory cover-letter DIR="$DIR" >>"$LOG" 2>&1 || fail "writing the cover letter"
@@ -66,6 +67,10 @@ echo "fit_confidence: $(field fit_confidence)"
 FIT="$(field fit_score)"
 if [[ "$FIT" =~ ^[0-9]+$ ]] && [ "$FIT" -lt 7 ]; then
   echo "note: fit is below 7 — see 'Fit gate' in CLAUDE.md before investing time"
+fi
+WARNINGS=$(tail -n +"$((START + 1))" "$LOG" | grep -c '^warning: ' || true)
+if [ "$WARNINGS" -gt 0 ]; then
+  echo "warnings: $WARNINGS (details in $LOG)"
 fi
 if [ "$ACTION" = apply ]; then
   echo "resume: $DIR/out/resume.pdf"

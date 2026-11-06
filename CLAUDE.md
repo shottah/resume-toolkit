@@ -38,6 +38,8 @@ of truth, then compiles it to PDF with tectonic.
   - `scaffold.sh`  — creates the application folder from a job description and scores the fit
   - `tailor.sh`    — runs `claude -p` to write a tailored resume or cover letter
   - `recheck.sh`   — re-scores an existing application; updates only the four `fit_*` lines
+  - `check.sh`     — after each PDF build, warns about extra pages, stock phrases
+    (`stock-phrases.txt`) and numbers not found in `source/`; never fails the build
   - `command.sh`   — runs `fit` or `apply` for the Claude Code commands and prints only a summary
   - `lib.sh`       — shared helpers (prompt rendering, first-run setup)
   - `prompts/`     — the instructions sent to Claude; edit these to change its behavior

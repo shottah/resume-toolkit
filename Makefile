@@ -47,7 +47,7 @@ pdf: check-deps
 	@test -f "$(TEX)" || { echo "error: $(TEX) not found"; exit 1; }
 	@out_dir="$$(dirname "$(TEX)")/out"; \
 	 mkdir -p "$$out_dir"; \
-	 $(TECTONIC) -o "$$out_dir" "$(TEX)"
+	 $(TECTONIC) --keep-logs -o "$$out_dir" "$(TEX)" && ./scripts/check.sh "$(TEX)"
 
 # Run the script tests (no claude or tectonic needed).
 #   make test
@@ -86,7 +86,8 @@ help:
 	@echo "      updates only the fit_* lines in its notes.md."
 	@echo ""
 	@echo "  make pdf          TEX=path/to/file.tex"
-	@echo "      Compile any .tex file to <its-dir>/out/<basename>.pdf."
+	@echo "      Compile any .tex file to <its-dir>/out/<basename>.pdf, then warn about"
+	@echo "      extra pages, stock phrases and numbers not found in source/."
 	@echo ""
 	@echo "  make test"
 	@echo "      Run the script tests (no claude or tectonic needed)."

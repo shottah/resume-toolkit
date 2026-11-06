@@ -147,6 +147,20 @@ updates only those four lines. If you can't honestly bridge the gap, press
 Ctrl-C to stop before the documents are written. Often the fix is adding
 real experience to `source/` that you had left out.
 
+## Checks after each build
+
+Every time a PDF is built, `scripts/check.sh` looks for three common problems
+and prints a warning for each one it finds. It never stops the build:
+
+- the document runs past one page;
+- a stock phrase such as "proven track record" or "spearheaded" appears that
+  your own `source/` doesn't use (the list is in `scripts/stock-phrases.txt`);
+- a number such as "40%", "$1.2M", "3x" or "12 engineers" appears that isn't
+  in `source/`.
+
+Read them as prompts to look again, not as errors: a number can be fine if
+you worked it out from your own facts.
+
 ## Changing how Claude writes
 
 The instructions Claude follows are plain text in `scripts/prompts/`:
