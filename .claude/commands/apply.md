@@ -15,7 +15,9 @@ shell writes the resume and cover letter, and tectonic compiles them.
 
 When it finishes, tell the user in a few short lines: the company and role,
 the fit score and any gaps, and the paths of the two PDFs. If the summary
-includes a note about low fit, pass it on.
+includes a note about low fit, pass it on. If it has a `warnings:` line (for
+example a page too many, a stock phrase, or a number not found in `source/`),
+pass that on with the log path so the user can look.
 
 Do not read the job description, the log, or the generated `.tex` files, and
 do not fetch the job link yourself. The script keeps job-posting text out of

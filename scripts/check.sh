@@ -31,8 +31,9 @@ fi
 tmp="$(mktemp -d "${TMPDIR:-/tmp}/check.XXXXXX")"
 trap 'rm -rf "$tmp"' EXIT
 
-# Your own words: everything in source/, lower case.
-find source -type f -exec cat {} + 2>/dev/null | tr '[:upper:]' '[:lower:]' > "$tmp/source"
+# Your own words: every fact file in source/, lower case. preferences.* files
+# are rules (they may list phrases to avoid), so they don't count.
+find source -type f ! -name 'preferences.*' -exec cat {} + 2>/dev/null | tr '[:upper:]' '[:lower:]' > "$tmp/source"
 
 # The document's text: LaTeX comments removed (an unescaped % starts one),
 # escaped \% and \$ turned back into % and $, links dropped, lower case.

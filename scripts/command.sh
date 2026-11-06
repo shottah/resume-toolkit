@@ -63,12 +63,15 @@ echo "role: $(field role)"
 echo "fit_score: $(field fit_score)"
 echo "fit_gaps: $(field fit_gaps)"
 echo "fit_minor_gaps: $(field fit_minor_gaps)"
-echo "fit_confidence: $(field fit_confidence)"
+CONFIDENCE="$(field fit_confidence | tr '[:upper:]' '[:lower:]')"
+case "$CONFIDENCE" in high|medium|low) ;; *) CONFIDENCE=unknown ;; esac
+echo "fit_confidence: $CONFIDENCE"
 FIT="$(field fit_score)"
 if [[ "$FIT" =~ ^[0-9]+$ ]] && [ "$FIT" -lt 7 ]; then
   echo "note: fit is below 7 — see 'Fit gate' in CLAUDE.md before investing time"
 fi
-WARNINGS=$(tail -n +"$((START + 1))" "$LOG" | grep -c '^warning: ' || true)
+# Count only scripts/check.sh warnings ("warning: <file>.tex: ..."), not tectonic's own.
+WARNINGS=$(tail -n +"$((START + 1))" "$LOG" | grep -c '^warning: .*\.tex: ' || true)
 if [ "$WARNINGS" -gt 0 ]; then
   echo "warnings: $WARNINGS (details in $LOG)"
 fi
