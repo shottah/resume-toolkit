@@ -5,6 +5,9 @@
 #   FAKE_DIR     scaffold mode: create this application folder and print its path
 #   FAKE_FIT     fit_score written to notes.md in scaffold mode (default 8)
 #   FAKE_OUTPUT  tailor mode: write a minimal .tex file to this path
+#                (when unset, the path after "to:" in a tailoring prompt is used)
+#   FAKE_CHATTER tailor mode: text to print on stdout, like the real CLI's final message
+#   FAKE_FAIL    exit with this code after recording the call
 set -euo pipefail
 
 log="${FAKE_LOG:?FAKE_LOG must be set}"
@@ -21,8 +24,15 @@ while [ $# -gt 0 ]; do
   shift
 done
 printf '%s' "$prompt" > "$log/prompt"
+[ -n "${FAKE_FAIL:-}" ] && exit "$FAKE_FAIL"
 
-if [ -n "${FAKE_DIR:-}" ]; then
+case "$prompt" in
+  Scaffold*) mode=scaffold ;;
+  *"You are tailoring"*) mode=tailor ;;
+  *) mode=other ;;
+esac
+
+if [ "$mode" = scaffold ] && [ -n "${FAKE_DIR:-}" ]; then
   mkdir -p "$FAKE_DIR"
   printf 'Fake job description.\n' > "$FAKE_DIR/job-description.md"
   cat > "$FAKE_DIR/notes.md" <<NOTES
@@ -43,6 +53,11 @@ NOTES
   printf '%s\n' "$FAKE_DIR"
 fi
 
-if [ -n "${FAKE_OUTPUT:-}" ]; then
-  printf '%s\n' '\documentclass{article}\begin{document}x\end{document}' > "$FAKE_OUTPUT"
+if [ "$mode" = tailor ]; then
+  output="${FAKE_OUTPUT:-$(printf '%s\n' "$prompt" | sed -n '/^Write a tailored/{n;s/^ *//;p;}')}"
+  printf '%s\n' '\documentclass{article}\begin{document}x\end{document}' > "$output"
 fi
+if [ "$mode" = tailor ] && [ -n "${FAKE_CHATTER:-}" ]; then
+  printf '%s\n' "$FAKE_CHATTER"
+fi
+exit 0

@@ -17,6 +17,9 @@ of truth, then compiles it to PDF with tectonic.
   - any other file (for example `certifications.yaml`) — more facts
   - `preferences.yaml` — your own rules for how to present your experience;
     read as rules, never as facts
+- `.claude/commands/` — the `/fit` and `/apply` commands for Claude Code. They
+  only run `scripts/command.sh`; they never read job postings, logs or
+  generated `.tex` files themselves.
 - `example/` — a made-up example person (`example/source/`) and a sample job
   description, so the tool works on a fresh clone.
 - `templates/` — structural LaTeX templates (preamble and layout). Claude reads
@@ -33,6 +36,7 @@ of truth, then compiles it to PDF with tectonic.
 - `scripts/` — the workflow scripts.
   - `scaffold.sh`  — creates the application folder from a job description and scores the fit
   - `tailor.sh`    — runs `claude -p` to write a tailored resume or cover letter
+  - `command.sh`   — runs `fit` or `apply` for the Claude Code commands and prints only a summary
   - `lib.sh`       — shared helpers (prompt rendering, first-run setup)
   - `prompts/`     — the instructions sent to Claude; edit these to change its behavior
 - `docs/images/` — README images, made from a real run on the example profile.

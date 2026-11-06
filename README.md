@@ -60,6 +60,24 @@ then creates `applications/YYYY-MM-<company>-<role>/` with the job
 description, a `notes.md` holding the fit score, and the compiled
 `out/resume.pdf` and `out/cover-letter.pdf`.
 
+## Use it inside Claude Code
+
+Open Claude Code in your copy of the repo and use the two built-in commands:
+
+```
+/fit https://example.com/jobs/senior-analytics-engineer
+/apply applications/2026-11-acme-corp-senior-analytics-engineer
+```
+
+- `/fit <job link or file>` scores the job against your profile and lists the
+  gaps, without writing any documents.
+- `/apply <job link, file, or folder from /fit>` writes the tailored resume and
+  cover letter and tells you where the PDFs are.
+
+Both run the same scripts as `make`. Your Claude Code session never reads the
+job posting itself: the restricted Claude does that, and your session only
+sees a short summary.
+
 ## Make it yours
 
 Edit the files in `source/`:

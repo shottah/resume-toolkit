@@ -1,4 +1,4 @@
-TECTONIC := tectonic
+TECTONIC ?= tectonic
 CLAUDE   ?= claude
 export CLAUDE
 
